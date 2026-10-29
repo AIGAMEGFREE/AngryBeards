@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Angry Birds — Ultimate Edition</title>
+<title>Angry Birds — Ultimate Edition (Final Fix)</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -17,163 +17,85 @@
         cursor: grab; touch-action: none; max-width: 100%; max-height: 100%;
     }
     canvas:active { cursor: grabbing; }
-
     .hud { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; pointer-events: none; }
-    .pill {
-        background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(230,240,255,0.9));
-        border-radius: 40px; padding: 10px 22px; font-weight: 800; font-size: 17px; color: #1a2340;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.35); display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px);
-    }
+    .pill { background: linear-gradient(180deg, #fff, #e0eaff); border-radius: 40px; padding: 10px 22px; font-weight: 800; font-size: 17px; color: #1a2340; box-shadow: 0 6px 20px rgba(0,0,0,0.35); display: flex; align-items: center; gap: 8px; }
     .pill .icon { font-size: 20px; }
     #score { color: #e63946; font-size: 20px; }
     #levelNameHud { color: #1971c2; }
-
     .controls { position: absolute; bottom: 24px; right: 24px; display: flex; gap: 12px; z-index: 10; }
-    button.btn {
-        border: none; border-radius: 14px; padding: 13px 24px; font-size: 15px; font-weight: 800;
-        color: white; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.25), 0 10px 25px rgba(0,0,0,0.35);
-        transition: transform 0.12s; display: flex; align-items: center; gap: 8px; font-family: inherit;
-    }
+    button.btn { border: none; border-radius: 14px; padding: 13px 24px; font-size: 15px; font-weight: 800; color: white; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.25); transition: transform 0.12s; display: flex; align-items: center; gap: 8px; font-family: inherit; }
     button.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
     .btn-restart { background: linear-gradient(180deg, #ff8c42, #f4511e); }
     .btn-menu    { background: linear-gradient(180deg, #7e57c2, #4527a0); }
     .btn-sound   { background: linear-gradient(180deg, #4dabf7, #1971c2); min-width: 54px; justify-content: center; padding: 13px 18px; }
     .btn-play    { background: linear-gradient(180deg, #52b788, #2d6a4f); font-size: 18px; padding: 15px 42px; border-radius: 16px; }
-
-    .hint {
-        position: absolute; bottom: 24px; left: 24px; background: rgba(255,255,255,0.9); color: #1a2340;
-        padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        z-index: 10; max-width: 260px; line-height: 1.4; transition: opacity 0.5s;
-    }
-
-    .overlay {
-        position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 50;
-        opacity: 0; pointer-events: none; transition: opacity 0.4s; background: rgba(10,14,39,0.85); border-radius: 14px; padding: 20px;
-    }
+    .hint { position: absolute; bottom: 24px; left: 24px; background: rgba(255,255,255,0.9); color: #1a2340; padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; z-index: 10; max-width: 260px; transition: opacity 0.5s; }
+    .overlay { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.4s; background: rgba(10,14,39,0.85); border-radius: 14px; }
     .overlay.show { opacity: 1; pointer-events: auto; }
-    .overlay-card {
-        background: linear-gradient(180deg, #fffbf2, #ffe9c7); border-radius: 28px; padding: 42px 56px; text-align: center;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.6); transform: scale(0.8); transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 90vw;
-    }
+    .overlay-card { background: linear-gradient(180deg, #fffbf2, #ffe9c7); border-radius: 28px; padding: 42px 56px; text-align: center; transform: scale(0.8); transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .overlay.show .overlay-card { transform: scale(1); }
-    .overlay-title {
-        font-size: 42px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(180deg, #ff9a3c, #e63946);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px;
-    }
+    .overlay-title { font-size: 42px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(180deg, #ff9a3c, #e63946); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .overlay-stars { font-size: 46px; margin: 14px 0 18px; letter-spacing: 6px; }
     .overlay-score { font-size: 22px; font-weight: 800; color: #4a3b2a; margin-bottom: 26px; }
     .overlay-score span { color: #e63946; font-size: 28px; }
     .overlay-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
-    .menu-screen {
-        position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center;
-        background: linear-gradient(180deg, #0a0e27 0%, #1a2151 30%, #3d4d8c 60%, #e8896b 100%);
-        border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 20px; overflow-y: auto;
-    }
+    .menu-screen { position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(180deg, #0a0e27 0%, #1a2151 30%, #3d4d8c 60%, #e8896b 100%); border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 20px; overflow-y: auto; }
     .menu-screen.show { opacity: 1; pointer-events: auto; }
-    .menu-title {
-        font-size: 82px; font-weight: 900; background: linear-gradient(180deg, #ffd93d, #ff6b35, #e63946);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 20px rgba(255,120,50,0.5)); margin-bottom: 6px;
-    }
+    .menu-title { font-size: 82px; font-weight: 900; background: linear-gradient(180deg, #ffd93d, #ff6b35, #e63946); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 20px rgba(255,120,50,0.5)); margin-bottom: 6px; }
     .menu-subtitle { font-size: 20px; color: rgba(255,255,255,0.75); font-weight: 600; letter-spacing: 6px; margin-bottom: 42px; }
     .menu-buttons { display: flex; flex-direction: column; gap: 16px; width: min(360px, 90%); }
-    .menu-btn {
-        border: none; border-radius: 18px; padding: 20px 32px; font-size: 20px; font-weight: 800; color: white; cursor: pointer;
-        letter-spacing: 1px; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 12px;
-        box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 14px 30px rgba(0,0,0,0.4); transition: transform 0.15s;
-    }
+    .menu-btn { border: none; border-radius: 18px; padding: 20px 32px; font-size: 20px; font-weight: 800; color: white; cursor: pointer; box-shadow: 0 8px 0 rgba(0,0,0,0.3); transition: transform 0.15s; }
     .menu-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
     .menu-btn.primary   { background: linear-gradient(180deg, #52b788, #2d6a4f); }
     .menu-btn.secondary { background: linear-gradient(180deg, #4dabf7, #1971c2); }
     .menu-btn.tertiary  { background: linear-gradient(180deg, #f5a623, #c87a00); }
     .menu-btn.quaternary{ background: linear-gradient(180deg, #f76b8a, #c9184a); }
-
-    .levels-screen {
-        position: absolute; inset: 0; z-index: 110; display: flex; flex-direction: column; align-items: center;
-        background: linear-gradient(180deg, #1a2151 0%, #3d4d8c 50%, #7a6bb0 100%);
-        border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 30px 20px; overflow-y: auto;
-    }
+    .levels-screen { position: absolute; inset: 0; z-index: 110; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #1a2151 0%, #3d4d8c 50%, #7a6bb0 100%); border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 30px 20px; overflow-y: auto; }
     .levels-screen.show { opacity: 1; pointer-events: auto; }
     .levels-header { display: flex; align-items: center; justify-content: space-between; width: min(900px, 100%); margin-bottom: 30px; }
     .levels-title { font-size: 46px; font-weight: 900; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-    .btn-back {
-        border: none; border-radius: 14px; padding: 12px 22px; font-size: 15px; font-weight: 800; color: white; cursor: pointer;
-        background: linear-gradient(180deg, #7e57c2, #4527a0); box-shadow: 0 5px 0 rgba(0,0,0,0.3);
-    }
+    .btn-back { border: none; border-radius: 14px; padding: 12px 22px; font-size: 15px; font-weight: 800; color: white; cursor: pointer; background: linear-gradient(180deg, #7e57c2, #4527a0); box-shadow: 0 5px 0 rgba(0,0,0,0.3); }
     .levels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 16px; width: min(900px, 100%); }
-    .level-card {
-        background: linear-gradient(180deg, #fffbf2, #ffd9a0); border-radius: 20px; padding: 16px 12px; text-align: center;
-        cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 rgba(120,80,40,0.5); border: 3px solid rgba(255,255,255,0.5); position: relative;
-    }
+    .level-card { background: linear-gradient(180deg, #fffbf2, #ffd9a0); border-radius: 20px; padding: 16px 12px; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 rgba(120,80,40,0.5); position: relative; }
     .level-card:hover { transform: translateY(-5px); }
     .level-card.locked { filter: grayscale(0.85) brightness(0.65); cursor: not-allowed; }
     .level-num { font-size: 26px; font-weight: 900; color: #e63946; }
     .level-name { font-size: 13px; font-weight: 800; color: #4a3b2a; margin-bottom: 8px; min-height: 30px; display: flex; align-items: center; justify-content: center; }
     .level-birds { display: flex; gap: 4px; justify-content: center; margin-bottom: 8px; flex-wrap: wrap; }
-    
-    .bird-icon {
-        width: 26px; height: 26px; border-radius: 50%; position: relative;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 -3px 6px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.4);
-    }
+    .bird-icon { width: 26px; height: 26px; border-radius: 50%; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.4); }
     .bird-icon.red    { background: radial-gradient(circle at 35% 30%, #ff8080, #c81e1e 70%, #7a0a0a); }
     .bird-icon.yellow { background: radial-gradient(circle at 35% 30%, #fff59d, #ffc107 70%, #a87a00); clip-path: polygon(100% 50%, 0 0, 0 100%); border-radius: 0; border: none; }
     .bird-icon.blue   { background: radial-gradient(circle at 35% 30%, #90caf9, #2196f3 70%, #0d47a1); }
     .bird-icon.black  { background: radial-gradient(circle at 35% 30%, #6c757d, #212529 70%, #000); }
     .bird-icon.white  { background: radial-gradient(circle at 35% 30%, #ffffff, #cfd8dc 70%, #90a4ae); }
-
     .bird-icon::before { content: ''; position: absolute; width: 8px; height: 8px; background: white; border-radius: 50%; top: 32%; left: 22%; box-shadow: 6px 0 0 white; }
     .bird-icon::after { content: ''; position: absolute; width: 3px; height: 3px; background: #000; border-radius: 50%; top: 40%; left: 28%; box-shadow: 6px 0 0 #000; }
     .bird-icon.yellow::before { top: 38%; left: 30%; box-shadow: 6px 0 0 white; }
     .bird-icon.yellow::after { top: 46%; left: 36%; box-shadow: 6px 0 0 #000; }
-
     .level-stars { font-size: 16px; }
     .level-lock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 46px; }
-
-    .ability-indicator {
-        position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95);
-        border-radius: 16px; padding: 12px 24px; font-weight: 800; font-size: 15px; color: #1a2340;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.4); z-index: 11; display: none; align-items: center; gap: 10px; pointer-events: none;
-    }
+    .ability-indicator { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); border-radius: 16px; padding: 12px 24px; font-weight: 800; font-size: 15px; color: #1a2340; z-index: 11; display: none; align-items: center; gap: 10px; }
     .ability-indicator.show { display: flex; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
-
-    .toast-ach {
-        position: fixed; top: 80px; right: 20px; background: linear-gradient(180deg, #fff9e6, #ffd700); color: #4a3b2a;
-        padding: 16px 24px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 3px rgba(255,215,0,0.5);
-        font-weight: 800; font-size: 15px; z-index: 999; display: flex; align-items: center; gap: 12px;
-        transform: translateX(400px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none;
-    }
+    .toast-ach { position: fixed; top: 80px; right: 20px; background: linear-gradient(180deg, #fff9e6, #ffd700); color: #4a3b2a; padding: 16px 24px; border-radius: 16px; font-weight: 800; font-size: 15px; z-index: 999; display: flex; align-items: center; gap: 12px; transform: translateX(400px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
     .toast-ach.show { transform: translateX(0); }
-
-    @media (max-width: 700px) {
-        .hint { display: none; } .menu-title { font-size: 52px; }
-        .levels-grid { grid-template-columns: repeat(2, 1fr); }
-        .overlay-card { padding: 32px 34px; }
-    }
+    @media (max-width: 700px) { .hint { display: none; } .menu-title { font-size: 52px; } .levels-grid { grid-template-columns: repeat(2, 1fr); } .overlay-card { padding: 32px 34px; } }
 </style>
 </head>
 <body>
-
 <div id="gameWrap">
     <canvas id="gameCanvas"></canvas>
-
     <div class="hud" id="hud" style="display:none;">
         <div class="pill"><span class="icon">⭐</span>Счёт: <span id="score">0</span></div>
         <div class="pill"><span class="icon">🏝️</span><span id="levelNameHud">Уровень</span></div>
     </div>
-
     <div class="hint" id="hint" style="display:none;">🎯 Потяни птицу и отпусти.<br>💥 Клик во время полёта — способность!</div>
-
-    <div class="ability-indicator" id="abilityIndicator">
-        <span id="abilityIcon">⚡</span><span id="abilityText">Клик — способность!</span>
-    </div>
-
+    <div class="ability-indicator" id="abilityIndicator"><span id="abilityIcon">⚡</span><span id="abilityText">Клик!</span></div>
     <div class="controls" id="controls" style="display:none;">
         <button class="btn btn-sound" id="soundBtn">🔊</button>
         <button class="btn btn-menu" id="menuBtn">☰ Меню</button>
         <button class="btn btn-restart" id="restartBtn">🔄</button>
     </div>
-
     <div class="overlay" id="overlay">
         <div class="overlay-card">
             <div class="overlay-title" id="overlayTitle">Победа!</div>
@@ -186,10 +108,9 @@
             </div>
         </div>
     </div>
-
     <div class="menu-screen show" id="menuScreen">
         <div class="menu-title">ANGRY BIRDS</div>
-        <div class="menu-subtitle">Ultimate Edition</div>
+        <div class="menu-subtitle">Boss Update</div>
         <div class="menu-buttons">
             <button class="menu-btn primary" id="playBtn">🎮 Играть</button>
             <button class="menu-btn secondary" id="levelsBtn">🗺️ Уровни</button>
@@ -197,122 +118,57 @@
             <button class="menu-btn tertiary" id="menuSoundBtn">🔊 Звук: Вкл</button>
         </div>
     </div>
-
     <div class="levels-screen" id="levelsScreen">
         <div class="levels-header"><div class="levels-title">Уровни</div><button class="btn-back" id="backBtn">← Назад</button></div>
         <div class="levels-grid" id="levelsGrid"></div>
     </div>
-
     <div class="levels-screen" id="achievementsScreen" style="z-index: 115;">
         <div class="levels-header"><div class="levels-title">🏆 Награды</div><button class="btn-back" id="achBackBtn">← Назад</button></div>
         <div class="levels-grid" id="achievementsGrid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"></div>
     </div>
 </div>
-
 <script>
-/* ============================================================
-   ANGRY BIRDS — ULTIMATE EDITION
-   Исправлена рогатка (резинки рвутся) и траектория
-   ============================================================ */
+const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
+const W = 1000, H = 640; canvas.width = W; canvas.height = H;
+function resizeCanvas() { const s = Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96; canvas.style.width = (W * s) + 'px'; canvas.style.height = (H * s) + 'px'; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const W = 1000;
-const H = 640;
-canvas.width = W;
-canvas.height = H;
+const $ = id => document.getElementById(id);
+const scoreEl = $('score'), levelNameHud = $('levelNameHud'), hud = $('hud'), controls = $('controls'), hint = $('hint');
+const abilityIndicator = $('abilityIndicator'), abilityIcon = $('abilityIcon'), abilityText = $('abilityText');
+const overlay = $('overlay'), overlayTitle = $('overlayTitle'), overlayStars = $('overlayStars'), overlayScore = $('overlayScore');
+const playAgainBtn = $('playAgainBtn'), nextLevelBtn = $('nextLevelBtn'), overlayMenuBtn = $('overlayMenuBtn'), restartBtn = $('restartBtn'), menuBtn = $('menuBtn'), soundBtn = $('soundBtn');
+const menuScreen = $('menuScreen'), levelsScreen = $('levelsScreen'), levelsGrid = $('levelsGrid'), playBtn = $('playBtn'), levelsBtn = $('levelsBtn'), menuSoundBtn = $('menuSoundBtn'), backBtn = $('backBtn');
+const achievementsBtn = $('achievementsBtn'), achievementsScreen = $('achievementsScreen'), achievementsGrid = $('achievementsGrid'), achBackBtn = $('achBackBtn');
 
-function resizeCanvas() {
-    const scale = Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96;
-    canvas.style.width = (W * scale) + 'px';
-    canvas.style.height = (H * scale) + 'px';
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-const scoreEl = document.getElementById('score');
-const levelNameHud = document.getElementById('levelNameHud');
-const hud = document.getElementById('hud');
-const controls = document.getElementById('controls');
-const hint = document.getElementById('hint');
-const abilityIndicator = document.getElementById('abilityIndicator');
-const abilityIcon = document.getElementById('abilityIcon');
-const abilityText = document.getElementById('abilityText');
-const overlay = document.getElementById('overlay');
-const overlayTitle = document.getElementById('overlayTitle');
-const overlayStars = document.getElementById('overlayStars');
-const overlayScore = document.getElementById('overlayScore');
-const playAgainBtn = document.getElementById('playAgainBtn');
-const nextLevelBtn = document.getElementById('nextLevelBtn');
-const overlayMenuBtn = document.getElementById('overlayMenuBtn');
-const restartBtn = document.getElementById('restartBtn');
-const menuBtn = document.getElementById('menuBtn');
-const soundBtn = document.getElementById('soundBtn');
-const menuScreen = document.getElementById('menuScreen');
-const levelsScreen = document.getElementById('levelsScreen');
-const levelsGrid = document.getElementById('levelsGrid');
-const playBtn = document.getElementById('playBtn');
-const levelsBtn = document.getElementById('levelsBtn');
-const menuSoundBtn = document.getElementById('menuSoundBtn');
-const backBtn = document.getElementById('backBtn');
-const achievementsBtn = document.getElementById('achievementsBtn');
-const achievementsScreen = document.getElementById('achievementsScreen');
-const achievementsGrid = document.getElementById('achievementsGrid');
-const achBackBtn = document.getElementById('achBackBtn');
-
-const SAVE_KEY = 'angryBirds_ultimate_v6';
+const SAVE_KEY = 'angryBirds_boss_update';
 let saveData = { levels: {}, achievements: {}, stats: { birds: 0, pigs: 0, blocks: 0, abilities: 0 } };
-
-function loadSave() {
-    try {
-        const raw = localStorage.getItem(SAVE_KEY);
-        if (raw) {
-            const p = JSON.parse(raw);
-            saveData = { ...saveData, ...p };
-            if (!saveData.stats) saveData.stats = { birds: 0, pigs: 0, blocks: 0, abilities: 0 };
-            if (!saveData.levels) saveData.levels = {};
-            if (!saveData.achievements) saveData.achievements = {};
-        }
-    } catch(e) {}
-}
+function loadSave() { try { const r = localStorage.getItem(SAVE_KEY); if (r) { saveData = JSON.parse(r); if (!saveData.stats) saveData.stats = { birds: 0, pigs: 0, blocks: 0, abilities: 0 }; } } catch(e) {} }
 function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {} }
 
 const ACHIEVEMENTS = {
-    firstWin:   { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
+    firstWin: { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
     threeStars: { icon: '⭐', name: 'Идеально!', desc: 'Получи 3 звезды', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
-    fiveLvls:   { icon: '🏆', name: 'Опытный', desc: 'Пройди 5 уровней', cond: () => Object.keys(saveData.levels).length >= 5 },
-    allLvls:    { icon: '👑', name: 'Мастер', desc: 'Пройди все 15 уровней', cond: () => Object.keys(saveData.levels).length >= 15 },
-    pig50:      { icon: '🐷', name: 'Охотник', desc: 'Убей 50 свиней', cond: () => saveData.stats.pigs >= 50 },
-    pig200:     { icon: '💀', name: 'Истребитель', desc: 'Убей 200 свиней', cond: () => saveData.stats.pigs >= 200 },
-    bird100:    { icon: '🐦', name: 'Птицелов', desc: 'Запусти 100 птиц', cond: () => saveData.stats.birds >= 100 },
-    block100:   { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 100 блоков', cond: () => saveData.stats.blocks >= 100 },
-    ability30:  { icon: '⚡', name: 'Мастер силы', desc: 'Используй 30 способностей', cond: () => saveData.stats.abilities >= 30 },
-    allStars:   { icon: '🌟', name: 'Перфекционист', desc: 'Собери 30 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=l.stars||0); return t>=30; } }
+    fiveLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 5 уровней', cond: () => Object.keys(saveData.levels).length >= 5 },
+    allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все 18 уровней', cond: () => Object.keys(saveData.levels).length >= 18 },
+    pig50: { icon: '🐷', name: 'Охотник', desc: 'Убей 50 свиней', cond: () => saveData.stats.pigs >= 50 },
+    pig200: { icon: '💀', name: 'Истребитель', desc: 'Убей 200 свиней', cond: () => saveData.stats.pigs >= 200 },
+    bird100: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 100 птиц', cond: () => saveData.stats.birds >= 100 },
+    block100: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 100 блоков', cond: () => saveData.stats.blocks >= 100 },
+    ability30: { icon: '⚡', name: 'Мастер силы', desc: 'Используй 30 способностей', cond: () => saveData.stats.abilities >= 30 },
+    allStars: { icon: '🌟', name: 'Перфекционист', desc: 'Собери 45 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=l.stars||0); return t>=45; } }
 };
-
 let achQueue = [];
 function checkAchievements() {
-    let newFound = false;
-    for (const [id, ach] of Object.entries(ACHIEVEMENTS)) {
-        if (!saveData.achievements[id] && ach.cond()) {
-            saveData.achievements[id] = true; achQueue.push(ach); newFound = true;
-        }
-    }
-    if (newFound) { saveGame(); processAchQueue(); }
+    let n = false; for (const [id, a] of Object.entries(ACHIEVEMENTS)) { if (!saveData.achievements[id] && a.cond()) { saveData.achievements[id] = true; achQueue.push(a); n = true; } }
+    if (n) { saveGame(); processAchQueue(); }
 }
 function processAchQueue() {
-    if (achQueue.length === 0) return;
-    const ach = achQueue.shift();
-    const toast = document.createElement('div');
-    toast.className = 'toast-ach';
-    toast.innerHTML = `<span style="font-size:32px;">${ach.icon}</span>
-        <div><div style="font-size:11px; opacity:0.7;">🏆 ДОСТИЖЕНИЕ</div>
-        <div>${ach.name}</div><div style="font-size:11px; opacity:0.6; font-weight:600;">${ach.desc}</div></div>`;
-    document.body.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('show'));
-    SFX.star();
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 3500);
-    setTimeout(processAchQueue, 4000);
+    if (!achQueue.length) return; const a = achQueue.shift();
+    const t = document.createElement('div'); t.className = 'toast-ach';
+    t.innerHTML = `<span style="font-size:32px;">${a.icon}</span><div><div style="font-size:11px; opacity:0.7;">🏆 ДОСТИЖЕНИЕ</div><div>${a.name}</div><div style="font-size:11px; opacity:0.6; font-weight:600;">${a.desc}</div></div>`;
+    document.body.appendChild(t); requestAnimationFrame(() => t.classList.add('show')); SFX.star();
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3500); setTimeout(processAchQueue, 4000);
 }
 
 const BIOMES = {
@@ -322,81 +178,58 @@ const BIOMES = {
     ice:    { skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)' }
 };
 
-const GRAVITY = 0.45;
-const AIR = 0.9985;
-const GROUND_Y = H - 78;
-const MAX_PULL = 130;
-const LAUNCH_MULT = 0.20;
-
-let state = {
-    phase: 'menu', score: 0, dragging: false, time: 0, launchTime: 0,
-    shake: 0, shakeX: 0, shakeY: 0, currentLevel: 0,
-    birdsUsed: 0, abilitiesUsed: 0
-};
-
+const GRAVITY = 0.45, AIR = 0.9985, GROUND_Y = H - 78, MAX_PULL = 130, LAUNCH_MULT = 0.20;
+let state = { phase: 'menu', score: 0, dragging: false, time: 0, launchTime: 0, shake: 0, shakeX: 0, shakeY: 0, currentLevel: 0, birdsUsed: 0, abilitiesUsed: 0 };
 let bird = null, birds = [], pigs = [], blocks = [], eggs = [], particles = [], feathers = [], floatingTexts = [], clouds = [], stars = [];
 const slingshot = { x: 165, y: GROUND_Y - 90, forkLeft: { x: 148, y: GROUND_Y - 115 }, forkRight: { x: 190, y: GROUND_Y - 105 } };
-
 let soundEnabled = true, audioCtx = null, lastAbilityTime = 0;
-const rand = (a, b) => a + Math.random() * (b - a);
-const randInt = (a, b) => Math.floor(rand(a, b + 1));
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const lerp = (a, b, t) => a + (b - a) * t;
-const dist = (x1, y1, x2, y2) => Math.hypot(x1 - x2, y1 - y2);
+const rand = (a, b) => a + Math.random() * (b - a), randInt = (a, b) => Math.floor(rand(a, b + 1)), clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t, dist = (x1, y1, x2, y2) => Math.hypot(x1 - x2, y1 - y2);
 
 const BIRD_TYPES = {
-    red:    { name: 'Ред',      icon: '🔴', color1: '#ff8f8f', color2: '#e63946', color3: '#7a0a0a', belly: 'rgba(255,235,220,0.75)', r: 20, ability: null,     abilityName: '' },
-    yellow: { name: 'Чак',      icon: '🟡', color1: '#fff59d', color2: '#ffc107', color3: '#a87a00', belly: 'rgba(255,250,220,0.75)', r: 19, ability: 'dash',   abilityName: 'Ускорение' },
-    blue:   { name: 'Блю',      icon: '🔵', color1: '#90caf9', color2: '#2196f3', color3: '#0d47a1', belly: 'rgba(230,245,255,0.75)', r: 14, ability: 'split',  abilityName: 'Разделение' },
-    black:  { name: 'Бомб',     icon: '⚫', color1: '#6c757d', color2: '#212529', color3: '#000000', belly: 'rgba(200,200,200,0.6)',  r: 22, ability: 'bomb',   abilityName: 'Взрыв' },
-    white:  { name: 'Матильда', icon: '⚪', color1: '#ffffff', color2: '#e0e0e0', color3: '#90a4ae', belly: 'rgba(240,240,240,0.8)',  r: 21, ability: 'drop',   abilityName: 'Бомба' }
+    red:    { name: 'Ред', icon: '🔴', color1: '#ff8f8f', color2: '#e63946', color3: '#7a0a0a', belly: 'rgba(255,235,220,0.75)', r: 20, ability: null, abilityName: '' },
+    yellow: { name: 'Чак', icon: '🟡', color1: '#fff59d', color2: '#ffc107', color3: '#a87a00', belly: 'rgba(255,250,220,0.75)', r: 19, ability: 'dash', abilityName: 'Ускорение' },
+    blue:   { name: 'Блю', icon: '🔵', color1: '#90caf9', color2: '#2196f3', color3: '#0d47a1', belly: 'rgba(230,245,255,0.75)', r: 14, ability: 'split', abilityName: 'Разделение' },
+    black:  { name: 'Бомб', icon: '⚫', color1: '#6c757d', color2: '#212529', color3: '#000000', belly: 'rgba(200,200,200,0.6)', r: 22, ability: 'bomb', abilityName: 'Взрыв' },
+    white:  { name: 'Матильда', icon: '⚪', color1: '#ffffff', color2: '#e0e0e0', color3: '#90a4ae', belly: 'rgba(240,240,240,0.8)', r: 21, ability: 'drop', abilityName: 'Бомба' }
 };
 
 const LEVELS = [
-    { name: 'Разминка', biome: 'sunset', birds: ['red', 'red', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 26, r: 26 }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 780, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 670, y: GROUND_Y - 132, w: 145, h: 22, type: 'wood' }], stars: [150, 220, 280] },
-    { name: 'Знакомство', biome: 'sunset', birds: ['red', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26 }, { x: 830, y: GROUND_Y - 26, r: 26 }, { x: 775, y: GROUND_Y - 100, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 820, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 690, y: GROUND_Y - 132, w: 165, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 190, w: 20, h: 60, type: 'wood' }, { x: 790, y: GROUND_Y - 190, w: 20, h: 60, type: 'wood' }], stars: [250, 350, 430] },
-    { name: 'Разделённые', biome: 'sunset', birds: ['blue', 'blue', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 780, y: GROUND_Y - 26, r: 24 }, { x: 860, y: GROUND_Y - 26, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 760, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 840, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 670, y: GROUND_Y - 100, w: 200, h: 20, type: 'wood' }], stars: [280, 360, 440] },
-    { name: 'Песчаная буря', biome: 'desert', birds: ['black', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 26, r: 26 }, { x: 900, y: GROUND_Y - 26, r: 26 }], blocks: [{ x: 660, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 760, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 860, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 650, y: GROUND_Y - 155, w: 250, h: 25, type: 'stone' }], stars: [300, 400, 500] },
-    { name: 'Пирамида', biome: 'desert', birds: ['white', 'yellow', 'black', 'blue'], pigs: [{ x: 730, y: GROUND_Y - 26, r: 26 }, { x: 830, y: GROUND_Y - 26, r: 26 }, { x: 780, y: GROUND_Y - 110, r: 24 }, { x: 880, y: GROUND_Y - 110, r: 24 }], blocks: [{ x: 690, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 790, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 890, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 680, y: GROUND_Y - 145, w: 250, h: 25, type: 'stone' }, { x: 720, y: GROUND_Y - 210, w: 22, h: 65, type: 'wood' }, { x: 850, y: GROUND_Y - 210, w: 22, h: 65, type: 'wood' }, { x: 710, y: GROUND_Y - 235, w: 175, h: 22, type: 'wood' }], stars: [380, 480, 600] },
-    { name: 'Тёмная башня', biome: 'night', birds: ['yellow', 'blue', 'black', 'red', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 130, r: 24 }, { x: 750, y: GROUND_Y - 230, r: 22 }, { x: 850, y: GROUND_Y - 26, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 800, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 690, y: GROUND_Y - 122, w: 145, h: 22, type: 'wood' }, { x: 710, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 700, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 770, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 720, y: GROUND_Y - 308, w: 80, h: 18, type: 'wood' }], stars: [400, 500, 620] },
-    { name: 'Луна', biome: 'night', birds: ['black', 'black', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26 }, { x: 820, y: GROUND_Y - 26, r: 26 }, { x: 920, y: GROUND_Y - 26, r: 26 }, { x: 770, y: GROUND_Y - 130, r: 24 }, { x: 870, y: GROUND_Y - 130, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 820, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 910, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 710, y: GROUND_Y - 218, w: 230, h: 18, type: 'wood' }], stars: [500, 620, 760] },
-    { name: 'Ледяной замок', biome: 'ice', birds: ['yellow', 'white', 'blue', 'black', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 24 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 720, y: GROUND_Y - 150, r: 22 }, { x: 900, y: GROUND_Y - 150, r: 22 }, { x: 810, y: GROUND_Y - 260, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 760, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 670, y: GROUND_Y - 122, w: 120, h: 22, type: 'wood' }, { x: 700, y: GROUND_Y - 200, w: 18, h: 78, type: 'wood' }, { x: 740, y: GROUND_Y - 200, w: 18, h: 78, type: 'wood' }, { x: 690, y: GROUND_Y - 218, w: 78, h: 18, type: 'stone' }, { x: 860, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 940, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 850, y: GROUND_Y - 122, w: 120, h: 22, type: 'wood' }, { x: 880, y: GROUND_Y - 200, w: 18, h: 78, type: 'wood' }, { x: 920, y: GROUND_Y - 200, w: 18, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 218, w: 78, h: 18, type: 'stone' }, { x: 780, y: GROUND_Y - 260, w: 60, h: 20, type: 'wood' }], stars: [550, 680, 820] },
-    { name: 'Северное сияние', biome: 'ice', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26 }, { x: 750, y: GROUND_Y - 26, r: 24 }, { x: 850, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 140, r: 24 }, { x: 750, y: GROUND_Y - 140, r: 22 }, { x: 850, y: GROUND_Y - 140, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 900, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 246, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 870, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 720, y: GROUND_Y - 240, w: 185, h: 20, type: 'stone' }, { x: 790, y: GROUND_Y - 300, w: 60, h: 60, type: 'wood' }], stars: [650, 800, 950] },
-    { name: 'Снежная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'blue', 'black', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 26, r: 26 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 130, r: 22 }, { x: 850, y: GROUND_Y - 130, r: 22 }, { x: 800, y: GROUND_Y - 230, r: 26 }, { x: 700, y: GROUND_Y - 230, r: 20 }, { x: 900, y: GROUND_Y - 230, r: 20 }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }], stars: [800, 1000, 1200] },
-    { name: 'Закат Империи', biome: 'sunset', birds: ['red', 'yellow', 'black', 'blue', 'white', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 26, r: 26 }, { x: 900, y: GROUND_Y - 26, r: 26 }, { x: 750, y: GROUND_Y - 120, r: 24 }, { x: 850, y: GROUND_Y - 120, r: 24 }, { x: 800, y: GROUND_Y - 240, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 780, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 880, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 670, y: GROUND_Y - 122, w: 245, h: 22, type: 'wood' }, { x: 730, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 830, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 720, y: GROUND_Y - 220, w: 130, h: 20, type: 'stone' }, { x: 750, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 810, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 308, w: 100, h: 18, type: 'wood' }], stars: [750, 950, 1150] },
-    { name: 'Песчаный шторм', biome: 'desert', birds: ['white', 'yellow', 'blue', 'black', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 24 }, { x: 820, y: GROUND_Y - 26, r: 24 }, { x: 920, y: GROUND_Y - 26, r: 24 }, { x: 770, y: GROUND_Y - 150, r: 22 }, { x: 870, y: GROUND_Y - 150, r: 22 }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 220, w: 22, h: 88, type: 'wood' }, { x: 820, y: GROUND_Y - 220, w: 22, h: 88, type: 'wood' }, { x: 710, y: GROUND_Y - 240, w: 140, h: 20, type: 'stone' }], stars: [700, 880, 1100] },
-    { name: 'Ночной дозор', biome: 'night', birds: ['black', 'black', 'white', 'yellow', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26 }, { x: 850, y: GROUND_Y - 26, r: 26 }, { x: 750, y: GROUND_Y - 140, r: 22 }, { x: 850, y: GROUND_Y - 140, r: 22 }, { x: 800, y: GROUND_Y - 250, r: 26 }, { x: 800, y: GROUND_Y - 360, r: 20 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 800, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 900, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 235, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 860, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 720, y: GROUND_Y - 250, w: 175, h: 20, type: 'stone' }, { x: 760, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 830, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 750, y: GROUND_Y - 350, w: 110, h: 20, type: 'wood' }], stars: [850, 1050, 1300] },
-    { name: 'Ледяной ад', biome: 'ice', birds: ['black', 'black', 'black', 'white', 'yellow', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 26, r: 24 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 140, r: 22 }, { x: 850, y: GROUND_Y - 140, r: 22 }, { x: 800, y: GROUND_Y - 250, r: 24 }, { x: 800, y: GROUND_Y - 360, r: 22 }], blocks: [{ x: 660, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 760, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 860, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 650, y: GROUND_Y - 145, w: 250, h: 25, type: 'stone' }, { x: 700, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 830, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 690, y: GROUND_Y - 250, w: 160, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 810, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 720, y: GROUND_Y - 350, w: 110, h: 20, type: 'stone' }], stars: [900, 1150, 1400] },
-    { name: 'Финальная битва', biome: 'sunset', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 26, r: 26 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 130, r: 22 }, { x: 850, y: GROUND_Y - 130, r: 22 }, { x: 800, y: GROUND_Y - 230, r: 26 }, { x: 700, y: GROUND_Y - 230, r: 20 }, { x: 900, y: GROUND_Y - 230, r: 20 }, { x: 800, y: GROUND_Y - 340, r: 22 }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }], stars: [1200, 1600, 2000] }
+    { name: 'Разминка', biome: 'sunset', birds: ['red', 'red', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 780, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 670, y: GROUND_Y - 132, w: 145, h: 22, type: 'wood' }] },
+    { name: 'Знакомство', biome: 'sunset', birds: ['red', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 830, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 775, y: GROUND_Y - 100, r: 24, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 820, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 690, y: GROUND_Y - 132, w: 165, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 190, w: 20, h: 60, type: 'wood' }, { x: 790, y: GROUND_Y - 190, w: 20, h: 60, type: 'wood' }] },
+    { name: 'Разделённые', biome: 'sunset', birds: ['blue', 'blue', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 780, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 860, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 760, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 840, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 670, y: GROUND_Y - 100, w: 200, h: 20, type: 'wood' }] },
+    { name: 'Песчаная буря', biome: 'desert', birds: ['black', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 26, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 760, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 860, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 650, y: GROUND_Y - 155, w: 250, h: 25, type: 'stone' }] },
+    { name: 'Каска', biome: 'desert', birds: ['yellow', 'black', 'red'], pigs: [{ x: 730, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 830, y: GROUND_Y - 26, r: 26, type: 'helmet' }], blocks: [{ x: 690, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 790, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 680, y: GROUND_Y - 145, w: 150, h: 25, type: 'stone' }] },
+    { name: 'Тёмная башня', biome: 'night', birds: ['yellow', 'blue', 'black', 'red', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 230, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 800, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 690, y: GROUND_Y - 122, w: 145, h: 22, type: 'wood' }, { x: 710, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 700, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 770, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 720, y: GROUND_Y - 308, w: 80, h: 18, type: 'wood' }] },
+    { name: 'Луна', biome: 'night', birds: ['black', 'black', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 820, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 920, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 770, y: GROUND_Y - 130, r: 24, type: 'normal' }, { x: 870, y: GROUND_Y - 130, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 820, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 910, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 710, y: GROUND_Y - 218, w: 230, h: 18, type: 'wood' }] },
+    { name: 'Бронированный', biome: 'ice', birds: ['yellow', 'white', 'blue', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 122, w: 220, h: 22, type: 'stone' }, { x: 730, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 870, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 720, y: GROUND_Y - 218, w: 180, h: 18, type: 'stone' }, { x: 760, y: GROUND_Y - 300, w: 18, h: 82, type: 'stone' }, { x: 840, y: GROUND_Y - 300, w: 18, h: 82, type: 'stone' }, { x: 750, y: GROUND_Y - 318, w: 120, h: 18, type: 'stone' }] },
+    // УРОВЕНЬ 9 ИСПРАВЛЕН (свиньи не касаются блоков)
+    { name: 'Северное сияние', biome: 'ice', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 820, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 890, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 24, type: 'normal' }, { x: 820, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 890, y: GROUND_Y - 140, r: 22, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 930, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 276, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 870, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 720, y: GROUND_Y - 240, w: 185, h: 20, type: 'stone' }, { x: 790, y: GROUND_Y - 300, w: 60, h: 60, type: 'wood' }] },
+    { name: 'Снежная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'blue', 'black', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 230, r: 26, type: 'normal' }, { x: 700, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 900, y: GROUND_Y - 230, r: 20, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }] },
+    { name: 'Закат Империи', biome: 'sunset', birds: ['red', 'yellow', 'black', 'blue', 'white', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 750, y: GROUND_Y - 120, r: 24, type: 'normal' }, { x: 850, y: GROUND_Y - 120, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 240, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 780, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 880, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 670, y: GROUND_Y - 122, w: 245, h: 22, type: 'wood' }, { x: 730, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 830, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 720, y: GROUND_Y - 220, w: 130, h: 20, type: 'stone' }, { x: 750, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 810, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 308, w: 100, h: 18, type: 'wood' }] },
+    { name: 'Песчаный шторм', biome: 'desert', birds: ['white', 'yellow', 'blue', 'black', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 820, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 920, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 770, y: GROUND_Y - 150, r: 22, type: 'normal' }, { x: 870, y: GROUND_Y - 150, r: 22, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 220, w: 22, h: 88, type: 'wood' }, { x: 820, y: GROUND_Y - 220, w: 22, h: 88, type: 'wood' }, { x: 710, y: GROUND_Y - 240, w: 140, h: 20, type: 'stone' }] },
+    { name: 'Ночной дозор', biome: 'night', birds: ['black', 'black', 'white', 'yellow', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 250, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 360, r: 20, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 800, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 900, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 235, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 860, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 720, y: GROUND_Y - 250, w: 175, h: 20, type: 'stone' }, { x: 760, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 830, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 750, y: GROUND_Y - 350, w: 110, h: 20, type: 'wood' }] },
+    { name: 'Ледяной ад', biome: 'ice', birds: ['black', 'black', 'black', 'white', 'yellow', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 250, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 360, r: 22, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 760, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 860, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 650, y: GROUND_Y - 145, w: 250, h: 25, type: 'stone' }, { x: 700, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 830, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 690, y: GROUND_Y - 250, w: 160, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 810, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 720, y: GROUND_Y - 350, w: 110, h: 20, type: 'stone' }] },
+    { name: 'Финальная битва', biome: 'sunset', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 230, r: 26, type: 'normal' }, { x: 700, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 900, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 340, r: 22, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }] },
+    { name: 'Осада', biome: 'desert', birds: ['black', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }, { x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 920, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 670, y: GROUND_Y - 122, w: 280, h: 22, type: 'stone' }, { x: 740, y: GROUND_Y - 200, w: 20, h: 78, type: 'stone' }, { x: 860, y: GROUND_Y - 200, w: 20, h: 78, type: 'stone' }, { x: 730, y: GROUND_Y - 218, w: 160, h: 18, type: 'stone' }, { x: 770, y: GROUND_Y - 300, w: 20, h: 82, type: 'stone' }, { x: 830, y: GROUND_Y - 300, w: 20, h: 82, type: 'stone' }, { x: 760, y: GROUND_Y - 318, w: 100, h: 18, type: 'stone' }] },
+    { name: 'Королевская битва', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 750, y: GROUND_Y - 40, r: 40, type: 'boss' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'helmet' }, { x: 750, y: GROUND_Y - 220, r: 22, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 800, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 145, h: 25, type: 'stone' }, { x: 720, y: GROUND_Y - 230, w: 20, h: 85, type: 'wood' }, { x: 760, y: GROUND_Y - 230, w: 20, h: 85, type: 'wood' }, { x: 710, y: GROUND_Y - 250, w: 80, h: 20, type: 'stone' }] }
 ];
 
 function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
 function beep(f, d, t='sine', v=0.15, s=null) {
     if (!soundEnabled || !audioCtx) return;
     const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
-    if (s) o.frequency.exponentialRampToValueAtTime(s, audioCtx.currentTime + d);
+    o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); if (s) o.frequency.exponentialRampToValueAtTime(s, audioCtx.currentTime + d);
     g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
     o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
 }
-const SFX = {
-    launch:()=>beep(420,0.18,'sawtooth',0.18,780), hit:()=>beep(180,0.09,'square',0.2,90),
-    pop:()=>{ beep(700,0.09,'sine',0.2,1200); setTimeout(()=>beep(1200,0.1,'sine',0.15,500),60); },
-    wood:()=>beep(240,0.1,'triangle',0.18,120), win:()=>{ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.22,'triangle',0.16), i*120)); },
-    lose:()=>{ [400,320,240].forEach((f,i)=>setTimeout(()=>beep(f,0.28,'sine',0.16), i*160)); },
-    pull:()=>beep(300,0.05,'sine',0.08,500), ability:()=>beep(600,0.15,'sawtooth',0.2,1400),
-    split:()=>{ [500,700,900].forEach((f,i)=>setTimeout(()=>beep(f,0.1,'triangle',0.14),i*40)); },
-    explosion:()=>{ beep(80,0.5,'sawtooth',0.35,30); beep(200,0.3,'square',0.2,50); },
-    dash:()=>beep(900,0.2,'sawtooth',0.2,1800), star:()=>{ [800,1000,1200].forEach((f,i)=>setTimeout(()=>beep(f,0.15,'triangle',0.15),i*100)); }
-};
+const SFX = { launch:()=>beep(420,0.18,'sawtooth',0.18,780), hit:()=>beep(180,0.09,'square',0.2,90), pop:()=>{ beep(700,0.09,'sine',0.2,1200); setTimeout(()=>beep(1200,0.1,'sine',0.15,500),60); }, wood:()=>beep(240,0.1,'triangle',0.18,120), win:()=>{ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.22,'triangle',0.16), i*120)); }, lose:()=>{ [400,320,240].forEach((f,i)=>setTimeout(()=>beep(f,0.28,'sine',0.16), i*160)); }, pull:()=>beep(300,0.05,'sine',0.08,500), ability:()=>beep(600,0.15,'sawtooth',0.2,1400), split:()=>{ [500,700,900].forEach((f,i)=>setTimeout(()=>beep(f,0.1,'triangle',0.14),i*40)); }, explosion:()=>{ beep(80,0.5,'sawtooth',0.35,30); beep(200,0.3,'square',0.2,50); }, dash:()=>beep(900,0.2,'sawtooth',0.2,1800), star:()=>{ [800,1000,1200].forEach((f,i)=>setTimeout(()=>beep(f,0.15,'triangle',0.15),i*100)); } };
 
 class Bird {
     constructor(x, y, typeKey = 'red') {
-        this.x = x; this.y = y; this.vx = 0; this.vy = 0;
-        this.typeKey = typeKey; this.type = BIRD_TYPES[typeKey]; this.r = this.type.r;
-        this.angle = 0; this.angularVel = 0; this.launched = false; this.resting = false;
-        this.trail = []; this.eyeBlink = 0; this.wingFlap = 0; this.hitCooldown = 0;
-        this.abilityUsed = false; this.abilityActive = 0; this.isChild = false; this.pulse = 0;
+        this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.typeKey = typeKey; this.type = BIRD_TYPES[typeKey]; this.r = this.type.r;
+        this.angle = 0; this.angularVel = 0; this.launched = false; this.resting = false; this.trail = []; this.eyeBlink = 0; this.wingFlap = 0;
+        this.hitCooldown = 0; this.abilityUsed = false; this.abilityActive = 0; this.isChild = false; this.pulse = 0;
+        this.stuckTimer = 0;
     }
     launch(vx, vy) {
         this.vx = vx; this.vy = vy; this.launched = true; this.resting = false; this.angularVel = 0.18;
@@ -404,43 +237,38 @@ class Bird {
         if (!this.isChild) { saveData.stats.birds++; state.birdsUsed++; saveGame(); }
     }
     activateAbility() {
-        if (this.abilityUsed || !this.launched || this.resting) return false;
+        if (this.abilityUsed || !this.launched || this.resting) return false; 
         const ab = this.type.ability; if (!ab) return false;
-        this.abilityUsed = true; SFX.ability(); state.shake = 5;
-        saveData.stats.abilities++; state.abilitiesUsed++; saveGame();
+        
+        this.abilityUsed = true; 
+        SFX.ability(); state.shake = 5; saveData.stats.abilities++; state.abilitiesUsed++; saveGame();
+
         if (ab === 'dash') {
-            const sp = Math.hypot(this.vx, this.vy)||1;
-            this.vx = (this.vx/sp)*22; this.vy = (this.vy/sp)*22; this.abilityActive = 30;
-            SFX.dash();
+            const sp = Math.hypot(this.vx, this.vy)||1; this.vx = (this.vx/sp)*22; this.vy = (this.vy/sp)*22; this.abilityActive = 30; SFX.dash();
             for(let i=0;i<15;i++) particles.push(new Particle(this.x-this.vx*i*0.3, this.y-this.vy*i*0.3, '#ffe066', {vx:rand(-1,1),vy:rand(-1,1),size:rand(4,8),gravity:0,decay:0.04}));
         } else if (ab === 'split') {
             for (let i = 0; i < 2; i++) {
-                const nb = new Bird(this.x, this.y, 'blue'); nb.isChild = true; nb.r = 12; nb.launched = true;
+                const nb = new Bird(this.x, this.y, 'blue'); 
+                nb.isChild = true; nb.abilityUsed = true; nb.r = 12; nb.launched = true;
                 const ang = Math.atan2(this.vy, this.vx) + (i===0?-0.35:0.35), spd = Math.hypot(this.vx,this.vy)*0.95;
                 nb.vx = Math.cos(ang)*spd; nb.vy = Math.sin(ang)*spd; nb.angularVel = 0.2; birds.push(nb);
+            } SFX.split(); spawnBurst(this.x, this.y, '#74c0fc', 12);
+        } else if (ab === 'bomb') { 
+            this.explode(); 
+            if (pigs.every(p => p.dead)) { 
+                state.phase = 'over'; 
+                setTimeout(showVictory, 500); 
             }
-            SFX.split(); spawnBurst(this.x, this.y, '#74c0fc', 12);
-        } else if (ab === 'bomb') { this.explode(); }
-        else if (ab === 'drop') {
-            eggs.push(new Egg(this.x, this.y + this.r, this)); this.vy -= 3;
-            SFX.ability(); spawnBurst(this.x, this.y + this.r, '#fff', 8);
+        } else if (ab === 'drop') { 
+            eggs.push(new Egg(this.x, this.y + this.r, this)); this.vy -= 3; SFX.ability(); spawnBurst(this.x, this.y + this.r, '#fff', 8); 
         }
         return true;
     }
     explode() {
         SFX.explosion(); state.shake = 25; const R = 130;
-        for (let i = 0; i < 40; i++) {
-            const a = rand(0, Math.PI*2), s = rand(3, 14);
-            particles.push(new Particle(this.x, this.y, ['#ff6b35','#ffd93d','#ff3b30'][randInt(0,2)], {vx:Math.cos(a)*s, vy:Math.sin(a)*s-2, size:rand(4,12), gravity:0.15, decay:rand(0.015,0.03)}));
-        }
-        pigs.forEach(p => {
-            if (p.dead) return; const d = dist(this.x, this.y, p.x, p.y);
-            if (d < R) { p.damage(clamp(200*(1-d/R),40,200)); p.vx += Math.cos(Math.atan2(p.y-this.y,p.x-this.x))*15; p.vy += Math.sin(Math.atan2(p.y-this.y,p.x-this.x))*15-3; p.resting=false; }
-        });
-        blocks.forEach(b => {
-            if (b.hp <= 0) return; const bx = b.x+b.w/2, by = b.y+b.h/2, d = dist(this.x, this.y, bx, by);
-            if (d < R) { b.damage(clamp(250*(1-d/R),30,250)); b.vx += Math.cos(Math.atan2(by-this.y,bx-this.x))*12; b.vy += Math.sin(Math.atan2(by-this.y,bx-this.x))*12-3; b.resting=false; }
-        });
+        for (let i = 0; i < 40; i++) { const a = rand(0, Math.PI*2), s = rand(3, 14); particles.push(new Particle(this.x, this.y, ['#ff6b35','#ffd93d','#ff3b30'][randInt(0,2)], {vx:Math.cos(a)*s, vy:Math.sin(a)*s-2, size:rand(4,12), gravity:0.15, decay:rand(0.015,0.03)})); }
+        pigs.forEach(p => { if (p.dead) return; const d = dist(this.x, this.y, p.x, p.y); if (d < R) { p.damage(999, Math.atan2(p.y-this.y,p.x-this.x)); p.vx += Math.cos(Math.atan2(p.y-this.y,p.x-this.x))*15; p.vy += Math.sin(Math.atan2(p.y-this.y,p.x-this.x))*15-3; p.resting=false; } });
+        blocks.forEach(b => { if (b.hp <= 0) return; const bx = b.x+b.w/2, by = b.y+b.h/2, d = dist(this.x, this.y, bx, by); if (d < R) { b.damage(clamp(250*(1-d/R),30,250)); b.vx += Math.cos(Math.atan2(by-this.y,bx-this.x))*12; b.vy += Math.sin(Math.atan2(by-this.y,bx-this.x))*12-3; b.resting=false; } });
         this.resting = true; this.vx = 0; this.vy = 0;
     }
     update() {
@@ -450,312 +278,234 @@ class Bird {
             if (Math.hypot(this.vx, this.vy) > 2) { this.trail.push({x:this.x, y:this.y, a:1, r:this.r}); if (this.trail.length > 24) this.trail.shift(); }
             this.trail.forEach(p => p.a *= 0.94);
             if (this.y + this.r >= GROUND_Y) {
-                this.y = GROUND_Y - this.r;
-                if (Math.abs(this.vy) > 1.5) { SFX.hit(); state.shake = Math.min(10, Math.abs(this.vy)); spawnDust(this.x, GROUND_Y, 10); }
+                this.y = GROUND_Y - this.r; if (Math.abs(this.vy) > 1.5) { SFX.hit(); state.shake = Math.min(10, Math.abs(this.vy)); spawnDust(this.x, GROUND_Y, 10); }
                 this.vy *= -0.42; this.vx *= 0.72; this.angularVel *= 0.6;
                 if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < 1.2) { this.vy = 0; this.vx = 0; this.resting = true; }
             }
             if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; }
             if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; }
+            if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) {
+                this.stuckTimer++; if (this.stuckTimer > 120) this.resting = true;
+            } else { this.stuckTimer = 0; }
             if (Math.abs(this.vx) < 0.15 && this.y + this.r >= GROUND_Y - 1 && Math.abs(this.vy) < 0.5) this.resting = true;
         } else { this.wingFlap += 0.08; }
-        if (this.hitCooldown > 0) this.hitCooldown--;
-        if (this.eyeBlink > 0) this.eyeBlink--; else if (Math.random() < 0.008) this.eyeBlink = 8;
-        if (this.abilityActive > 0) this.abilityActive--;
-        this.pulse += 0.15;
+        if (this.hitCooldown > 0) this.hitCooldown--; if (this.eyeBlink > 0) this.eyeBlink--; else if (Math.random() < 0.008) this.eyeBlink = 8;
+        if (this.abilityActive > 0) this.abilityActive--; this.pulse += 0.15;
     }
     draw() {
         const t = this.type, R = this.r;
-        for (let i = 0; i < this.trail.length; i++) {
-            const p = this.trail[i], k = i / this.trail.length;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (0.3 + k * 0.6), 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255,220,140,${p.a * 0.25 * k})`; ctx.fill();
-        }
-        if (this.abilityActive > 0) {
-            const pulse = 1 + Math.sin(this.pulse * 2) * 0.15;
-            const glow = ctx.createRadialGradient(this.x, this.y, R, this.x, this.y, R * 2.5 * pulse);
-            glow.addColorStop(0, 'rgba(255,230,102,0.5)'); glow.addColorStop(1, 'rgba(255,230,102,0)');
-            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(this.x, this.y, R * 2.5 * pulse, 0, Math.PI * 2); ctx.fill();
-        }
-        if (this.launched && !this.resting && !this.abilityUsed && t.ability) {
-            const pulse = 0.7 + Math.sin(this.pulse * 3) * 0.3;
-            ctx.beginPath(); ctx.arc(this.x, this.y, R * 1.5 * pulse, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(255,255,255,${0.4 * pulse})`; ctx.lineWidth = 3; ctx.stroke();
-        }
+        for (let i = 0; i < this.trail.length; i++) { const p = this.trail[i], k = i / this.trail.length; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (0.3 + k * 0.6), 0, Math.PI * 2); ctx.fillStyle = `rgba(255,220,140,${p.a * 0.25 * k})`; ctx.fill(); }
+        if (this.abilityActive > 0) { const p = 1 + Math.sin(this.pulse * 2) * 0.15; const g = ctx.createRadialGradient(this.x, this.y, R, this.x, this.y, R * 2.5 * p); g.addColorStop(0, 'rgba(255,230,102,0.5)'); g.addColorStop(1, 'rgba(255,230,102,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, R * 2.5 * p, 0, Math.PI * 2); ctx.fill(); }
+        if (this.launched && !this.resting && !this.abilityUsed && t.ability) { const p = 0.7 + Math.sin(this.pulse * 3) * 0.3; ctx.beginPath(); ctx.arc(this.x, this.y, R * 1.5 * p, 0, Math.PI * 2); ctx.strokeStyle = `rgba(255,255,255,${0.4 * p})`; ctx.lineWidth = 3; ctx.stroke(); }
         ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle);
         ctx.beginPath(); ctx.ellipse(0, 4, R * 1.05, R * 1.0, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fill();
-        if (this.typeKey !== 'yellow') {
-            ctx.beginPath(); ctx.moveTo(-R * 0.7, -R * 0.3); ctx.lineTo(-R * 1.8, -R * 0.7); ctx.lineTo(-R * 1.6, 0); ctx.lineTo(-R * 1.9, R * 0.6); ctx.lineTo(-R * 0.7, R * 0.4); ctx.closePath();
-            const tailGrad = ctx.createLinearGradient(-R*1.8, 0, -R*0.6, 0); tailGrad.addColorStop(0, t.color3); tailGrad.addColorStop(1, t.color2);
-            ctx.fillStyle = tailGrad; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.5; ctx.stroke();
-        }
+        if (this.typeKey !== 'yellow') { ctx.beginPath(); ctx.moveTo(-R * 0.7, -R * 0.3); ctx.lineTo(-R * 1.8, -R * 0.7); ctx.lineTo(-R * 1.6, 0); ctx.lineTo(-R * 1.9, R * 0.6); ctx.lineTo(-R * 0.7, R * 0.4); ctx.closePath(); const g = ctx.createLinearGradient(-R*1.8, 0, -R*0.6, 0); g.addColorStop(0, t.color3); g.addColorStop(1, t.color2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.5; ctx.stroke(); }
         if (this.typeKey === 'yellow') {
-            const tipX = R * 1.15, backX = -R * 0.95, topY = -R * 1.0, botY = R * 1.0;
-            const triGrad = ctx.createRadialGradient(-R*0.2, -R*0.3, R*0.2, 0, 0, R*1.2);
-            triGrad.addColorStop(0, t.color1); triGrad.addColorStop(0.5, t.color2); triGrad.addColorStop(1, t.color3);
-            ctx.beginPath(); ctx.moveTo(tipX, 0); ctx.lineTo(backX, topY); ctx.lineTo(backX, botY); ctx.closePath(); ctx.fillStyle = triGrad; ctx.fill();
+            const tipX = R * 1.15, backX = -R * 0.95, topY = -R * 1.0, botY = R * 1.0; const g = ctx.createRadialGradient(-R*0.2, -R*0.3, R*0.2, 0, 0, R*1.2);
+            g.addColorStop(0, t.color1); g.addColorStop(0.5, t.color2); g.addColorStop(1, t.color3);
+            ctx.beginPath(); ctx.moveTo(tipX, 0); ctx.lineTo(backX, topY); ctx.lineTo(backX, botY); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
             ctx.beginPath(); ctx.arc(backX + R*0.15, topY + R*0.05, R*0.2, 0, Math.PI * 2); ctx.fillStyle = t.color2; ctx.fill();
             ctx.beginPath(); ctx.arc(backX + R*0.15, botY - R*0.05, R*0.2, 0, Math.PI * 2); ctx.fillStyle = t.color2; ctx.fill();
             ctx.beginPath(); ctx.moveTo(tipX - R*0.7, -R*0.3); ctx.lineTo(backX + R*0.3, -R*0.75); ctx.lineTo(backX + R*0.3, -R*0.35); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fill();
             ctx.beginPath(); ctx.moveTo(tipX, 0); ctx.lineTo(backX, topY); ctx.lineTo(backX, botY); ctx.closePath(); ctx.strokeStyle = 'rgba(120,80,0,0.8)'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
             ctx.beginPath(); ctx.moveTo(tipX - R*0.15, R*0.2); ctx.lineTo(backX + R*0.4, R*0.85); ctx.lineTo(backX + R*0.2, R*0.5); ctx.closePath(); ctx.fillStyle = t.belly; ctx.fill();
         } else {
-            const bodyGrad = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.1);
-            bodyGrad.addColorStop(0, t.color1); bodyGrad.addColorStop(0.5, t.color2); bodyGrad.addColorStop(1, t.color3);
-            ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = bodyGrad; ctx.fill();
+            const g = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.1); g.addColorStop(0, t.color1); g.addColorStop(0.5, t.color2); g.addColorStop(1, t.color3);
+            ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
             ctx.beginPath(); ctx.ellipse(-R*0.35, -R*0.45, R*0.4, R*0.28, -0.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fill();
             ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 2; ctx.stroke();
             ctx.beginPath(); ctx.ellipse(R*0.1, R*0.45, R*0.55, R*0.32, 0, 0, Math.PI * 2); ctx.fillStyle = t.belly; ctx.fill();
         }
-        ctx.beginPath();
-        if (this.typeKey === 'yellow') { ctx.moveTo(-R*0.55, -R*0.5); ctx.lineTo(R*0.05, -R*0.7); } else { ctx.moveTo(-R*0.75, -R*0.55); ctx.lineTo(R*0.05, -R*0.75); }
+        ctx.beginPath(); if (this.typeKey === 'yellow') { ctx.moveTo(-R*0.55, -R*0.5); ctx.lineTo(R*0.05, -R*0.7); } else { ctx.moveTo(-R*0.75, -R*0.55); ctx.lineTo(R*0.05, -R*0.75); }
         ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.stroke();
-        const eyeOpen = this.eyeBlink > 0 ? 0.15 : 1;
-        ctx.beginPath(); ctx.ellipse(-R*0.2, -R*0.28, R*0.28, R*0.3 * eyeOpen, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(R*0.28, -R*0.28, R*0.28, R*0.3 * eyeOpen, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
+        const eo = this.eyeBlink > 0 ? 0.15 : 1;
+        ctx.beginPath(); ctx.ellipse(-R*0.2, -R*0.28, R*0.28, R*0.3 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(R*0.28, -R*0.28, R*0.28, R*0.3 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
         if (this.eyeBlink <= 0) {
-            const lookX = clamp(this.vx * 0.05, -3, 3), lookY = clamp(this.vy * 0.03, -3, 3);
-            ctx.beginPath(); ctx.arc(-R*0.2 + lookX, -R*0.25 + lookY, R*0.13, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
-            ctx.beginPath(); ctx.arc(R*0.28 + lookX, -R*0.25 + lookY, R*0.13, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
-            ctx.beginPath(); ctx.arc(-R*0.24 + lookX, -R*0.3 + lookY, R*0.05, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
-            ctx.beginPath(); ctx.arc(R*0.24 + lookX, -R*0.3 + lookY, R*0.05, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+            const lx = clamp(this.vx * 0.05, -3, 3), ly = clamp(this.vy * 0.03, -3, 3);
+            ctx.beginPath(); ctx.arc(-R*0.2 + lx, -R*0.25 + ly, R*0.13, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
+            ctx.beginPath(); ctx.arc(R*0.28 + lx, -R*0.25 + ly, R*0.13, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-R*0.24 + lx, -R*0.3 + ly, R*0.05, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+            ctx.beginPath(); ctx.arc(R*0.24 + lx, -R*0.3 + ly, R*0.05, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         }
         ctx.beginPath(); ctx.moveTo(R*0.55, -R*0.05); ctx.lineTo(R*1.55, R*0.15); ctx.lineTo(R*0.55, R*0.42); ctx.closePath();
-        const beakGrad = ctx.createLinearGradient(R*0.55, 0, R*1.55, 0); beakGrad.addColorStop(0, '#ffd93d'); beakGrad.addColorStop(1, '#f7a11a');
-        ctx.fillStyle = beakGrad; ctx.fill(); ctx.strokeStyle = '#a86a00'; ctx.lineWidth = 1.5; ctx.stroke();
+        const bg = ctx.createLinearGradient(R*0.55, 0, R*1.55, 0); bg.addColorStop(0, '#ffd93d'); bg.addColorStop(1, '#f7a11a');
+        ctx.fillStyle = bg; ctx.fill(); ctx.strokeStyle = '#a86a00'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.beginPath(); ctx.moveTo(R*0.6, R*0.15); ctx.lineTo(R*1.5, R*0.15); ctx.strokeStyle = 'rgba(140,80,0,0.6)'; ctx.lineWidth = 1; ctx.stroke();
         drawHohol(ctx, R, this.typeKey, t, this.pulse);
         if (this.typeKey === 'black') {
             ctx.beginPath(); ctx.moveTo(0, -R); ctx.quadraticCurveTo(5, -R*1.4, 10, -R*1.5); ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 3; ctx.stroke();
-            const sparkR = 3 + Math.sin(this.pulse * 3) * 1.5;
-            ctx.beginPath(); ctx.arc(10, -R*1.5, sparkR, 0, Math.PI * 2); ctx.fillStyle = '#ffcc00'; ctx.shadowColor = '#ff6b35'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0;
+            const sr = 3 + Math.sin(this.pulse * 3) * 1.5; ctx.beginPath(); ctx.arc(10, -R*1.5, sr, 0, Math.PI * 2); ctx.fillStyle = '#ffcc00'; ctx.shadowColor = '#ff6b35'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0;
         }
-        if (this.typeKey === 'white') {
-            ctx.beginPath(); ctx.ellipse(-R*0.5, -R*0.8, R*0.25, R*0.15, -0.8, 0, Math.PI * 2); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = 'rgba(120,140,160,0.6)'; ctx.lineWidth = 1; ctx.stroke();
-        }
+        if (this.typeKey === 'white') { ctx.beginPath(); ctx.ellipse(-R*0.5, -R*0.8, R*0.25, R*0.15, -0.8, 0, Math.PI * 2); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = 'rgba(120,140,160,0.6)'; ctx.lineWidth = 1; ctx.stroke(); }
         ctx.restore();
     }
 }
-
-function drawHohol(ctx, R, typeKey, t, pulse) {
-    if (typeKey === 'red') {
-        ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.05, -R*1.6, R*0.35, -R*1.15); ctx.quadraticCurveTo(R*0.1, -R*1.3, R*0.25, -R*0.95); ctx.closePath(); ctx.fillStyle = t.color2; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-R*0.5, -R*0.85); ctx.quadraticCurveTo(-R*0.6, -R*1.3, -R*0.15, -R*1.05); ctx.closePath(); ctx.fillStyle = t.color2; ctx.fill(); ctx.stroke();
-    } else if (typeKey === 'yellow') {
-        ctx.beginPath(); ctx.moveTo(-R*0.4, -R*0.95); ctx.quadraticCurveTo(-R*0.55, -R*1.6, -R*0.15, -R*1.3); ctx.quadraticCurveTo(-R*0.25, -R*1.1, 0, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-R*0.05, -R*1.0); ctx.quadraticCurveTo(R*0.15, -R*1.65, R*0.5, -R*1.15); ctx.quadraticCurveTo(R*0.2, -R*1.2, R*0.3, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke();
-    } else if (typeKey === 'blue') {
-        ctx.beginPath(); ctx.moveTo(-R*0.2, -R*0.85); ctx.quadraticCurveTo(-R*0.1, -R*1.4, R*0.2, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1; ctx.stroke();
-    } else if (typeKey === 'white') {
-        ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.3, -R*1.55, R*0.15, -R*1.2); ctx.quadraticCurveTo(R*0.0, -R*1.1, R*0.15, -R*0.95); ctx.closePath(); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 1.2; ctx.stroke();
-    }
+function drawHohol(ctx, R, tK, t, p) {
+    if (tK === 'red') { ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.05, -R*1.6, R*0.35, -R*1.15); ctx.quadraticCurveTo(R*0.1, -R*1.3, R*0.25, -R*0.95); ctx.closePath(); ctx.fillStyle = t.color2; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke(); ctx.beginPath(); ctx.moveTo(-R*0.5, -R*0.85); ctx.quadraticCurveTo(-R*0.6, -R*1.3, -R*0.15, -R*1.05); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+    else if (tK === 'yellow') { ctx.beginPath(); ctx.moveTo(-R*0.4, -R*0.95); ctx.quadraticCurveTo(-R*0.55, -R*1.6, -R*0.15, -R*1.3); ctx.quadraticCurveTo(-R*0.25, -R*1.1, 0, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke(); ctx.beginPath(); ctx.moveTo(-R*0.05, -R*1.0); ctx.quadraticCurveTo(R*0.15, -R*1.65, R*0.5, -R*1.15); ctx.quadraticCurveTo(R*0.2, -R*1.2, R*0.3, -R*1.0); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+    else if (tK === 'blue') { ctx.beginPath(); ctx.moveTo(-R*0.2, -R*0.85); ctx.quadraticCurveTo(-R*0.1, -R*1.4, R*0.2, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1; ctx.stroke(); }
+    else if (tK === 'white') { ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.3, -R*1.55, R*0.15, -R*1.2); ctx.quadraticCurveTo(R*0.0, -R*1.1, R*0.15, -R*0.95); ctx.closePath(); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 1.2; ctx.stroke(); }
 }
 
 class Egg {
     constructor(x, y, p) { this.x=x; this.y=y; this.vx=0; this.vy=2; this.r=12; this.parent=p; this.exploded=false; }
-    update() {
-        if (this.exploded) return;
-        this.vy += GRAVITY; this.x += this.vx; this.y += this.vy;
+    update() { if (this.exploded) return; this.vy += GRAVITY; this.x += this.vx; this.y += this.vy;
         if (this.y + this.r >= GROUND_Y) { this.y = GROUND_Y - this.r; this.explode(); return; }
         for (const p of pigs) { if (!p.dead && dist(this.x, this.y, p.x, p.y) < this.r + p.r) { this.explode(); return; } }
-        for (const b of blocks) { if (b.hp > 0 && this.x > b.x-this.r && this.x < b.x+b.w+this.r && this.y > b.y-this.r && this.y < b.y+b.h+this.r) { this.explode(); return; } }
-    }
-    explode() {
-        if (this.exploded) return; this.exploded = true;
-        SFX.explosion(); state.shake = 18; const R = 100;
-        for (let i = 0; i < 30; i++) {
-            const a = rand(0, Math.PI*2), s = rand(3,12);
-            particles.push(new Particle(this.x, this.y, ['#ff6b35','#ffd93d','#fff'][randInt(0,2)], {vx:Math.cos(a)*s, vy:Math.sin(a)*s-2, size:rand(3,9), gravity:0.2, decay:0.02}));
-        }
-        pigs.forEach(p => { if (!p.dead && dist(this.x, this.y, p.x, p.y) < R) { p.damage(clamp(150*(1-dist(this.x,this.y,p.x,p.y)/R),30,150)); p.resting=false; } });
-        blocks.forEach(b => { if (b.hp>0 && dist(this.x, this.y, b.x+b.w/2, b.y+b.h/2) < R) { b.damage(clamp(180*(1-dist(this.x,this.y,b.x+b.w/2,b.y+b.h/2)/R),30,180)); b.resting=false; } });
-    }
-    draw() {
-        if (this.exploded) return;
-        ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.vx * 0.05); ctx.shadowColor = '#ff6b35'; ctx.shadowBlur = 15;
-        ctx.beginPath(); ctx.ellipse(0, 0, this.r, this.r * 1.25, 0, 0, Math.PI * 2);
-        const g = ctx.createRadialGradient(-3, -3, 2, 0, 0, this.r * 1.3); g.addColorStop(0, '#fff'); g.addColorStop(1, '#e0e0e0');
-        ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = '#adb5bd'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
-        ctx.beginPath(); ctx.moveTo(-3, -8); ctx.lineTo(2, -2); ctx.lineTo(-2, 4); ctx.lineTo(3, 10); ctx.strokeStyle = '#ff6b35'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.restore();
-    }
+        for (const b of blocks) { if (b.hp > 0 && this.x > b.x-this.r && this.x < b.x+b.w+this.r && this.y > b.y-this.r && this.y < b.y+b.h+this.r) { this.explode(); return; } } }
+    explode() { if (this.exploded) return; this.exploded = true; SFX.explosion(); state.shake = 18; const R = 100;
+        for (let i = 0; i < 30; i++) { const a = rand(0, Math.PI*2), s = rand(3,12); particles.push(new Particle(this.x, this.y, ['#ff6b35','#ffd93d','#fff'][randInt(0,2)], {vx:Math.cos(a)*s, vy:Math.sin(a)*s-2, size:rand(3,9), gravity:0.2, decay:0.02})); }
+        pigs.forEach(p => { if (!p.dead && dist(this.x, this.y, p.x, p.y) < R) { p.damage(999, Math.atan2(p.y-this.y,p.x-this.x)); p.resting=false; } });
+        blocks.forEach(b => { if (b.hp>0 && dist(this.x, this.y, b.x+b.w/2, b.y+b.h/2) < R) { b.damage(clamp(180*(1-dist(this.x,this.y,b.x+b.w/2,b.y+b.h/2)/R),30,180)); b.resting=false; } }); }
+    draw() { if (this.exploded) return; ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.vx * 0.05); ctx.shadowColor = '#ff6b35'; ctx.shadowBlur = 15;
+        ctx.beginPath(); ctx.ellipse(0, 0, this.r, this.r * 1.25, 0, 0, Math.PI * 2); const g = ctx.createRadialGradient(-3, -3, 2, 0, 0, this.r * 1.3); g.addColorStop(0, '#fff'); g.addColorStop(1, '#e0e0e0'); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = '#adb5bd'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.moveTo(-3, -8); ctx.lineTo(2, -2); ctx.lineTo(-2, 4); ctx.lineTo(3, 10); ctx.strokeStyle = '#ff6b35'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
 }
 
 class Pig {
-    constructor(x, y, r = 26) {
-        this.x=x; this.y=y; this.r=r; this.vx=0; this.vy=0; this.hp=100; this.maxHp=100;
-        this.dead=false; this.resting=true; this.hurtFlash=0; this.blink=0; this.squish=0; this.breathing=Math.random()*Math.PI*2;
+    constructor(x, y, r = 26, type = 'normal') { 
+        this.x=x; this.y=y; this.r=r; this.type=type; this.vx=0; this.vy=0; this.hp = type==='boss' ? 3 : 1; this.dead=false; this.resting=true; this.hurtFlash=0; this.blink=0; this.squish=0; this.breathing=Math.random()*Math.PI*2; 
     }
-    damage(amount) {
-        if (this.dead) return; this.hp -= amount; this.hurtFlash = 12; this.squish = 1;
-        if (this.hp <= 0) {
-            this.dead = true; state.score += 100; addScore(100, this.x, this.y);
-            SFX.pop(); spawnBurst(this.x, this.y, '#90ee90', 22); spawnFeathers(this.x, this.y, 6, '#90ee90'); state.shake = 8;
-            saveData.stats.pigs++; saveGame();
-        } else { SFX.wood(); }
-    }
-    update() {
-        if (this.hurtFlash > 0) this.hurtFlash--; if (this.squish > 0) this.squish *= 0.85;
-        if (this.blink > 0) this.blink--; else if (Math.random() < 0.01) this.blink = 10;
-        this.breathing += 0.05;
-        if (!this.resting && !this.dead) {
-            this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy;
-            if (this.y + this.r >= GROUND_Y) {
-                this.y = GROUND_Y - this.r; if (Math.abs(this.vy) > 4) this.damage(Math.abs(this.vy) * 3);
-                this.vy *= -0.35; this.vx *= 0.7;
-                if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < 0.7) { this.vy = 0; this.vx = 0; this.resting = true; }
+    damage(amount, angle) { 
+        if (this.dead) return; 
+        // Проверка каски: если птица летит сверху, урона нет
+        if (this.type === 'helmet' && angle !== undefined) {
+            // Угол от 45 до 135 градусов (сверху) = защита
+            const deg = (angle * 180 / Math.PI) % 360;
+            if (deg > 45 && deg < 135) {
+                SFX.wood();
+                spawnBurst(this.x, this.y - this.r, '#ccc', 8);
+                return; 
             }
-            if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; }
-            if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; }
         }
+
+        this.hp -= amount; this.hurtFlash = 12; this.squish = 1;
+        if (this.hp <= 0) { 
+            this.dead = true; 
+            const pts = this.type==='boss' ? 10000 : (this.type==='helmet' ? 2000 : 5000);
+            state.score += pts; addScore(pts, this.x, this.y); 
+            SFX.pop(); spawnBurst(this.x, this.y, '#90ee90', 22); spawnFeathers(this.x, this.y, 6, '#90ee90'); state.shake = 8; saveData.stats.pigs++; saveGame(); 
+        } else { SFX.wood(); } 
     }
-    draw() {
-        if (this.dead) return;
-        const R = this.r, breathe = Math.sin(this.breathing) * 0.03;
-        const sx = 1 + this.squish * 0.25 + breathe, sy = 1 - this.squish * 0.25 - breathe;
+    update() { if (this.hurtFlash > 0) this.hurtFlash--; if (this.squish > 0) this.squish *= 0.85; if (this.blink > 0) this.blink--; else if (Math.random() < 0.01) this.blink = 10; this.breathing += 0.05;
+        if (!this.resting && !this.dead) { this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy;
+            if (this.y + this.r >= GROUND_Y) { this.y = GROUND_Y - this.r; if (Math.abs(this.vy) > 4) this.damage(Math.abs(this.vy) * 3); this.vy *= -0.35; this.vx *= 0.7;
+                if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < 0.7) { this.vy = 0; this.vx = 0; this.resting = true; } }
+            if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; } if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; } } }
+    draw() { if (this.dead) return; const R = this.r, br = Math.sin(this.breathing) * 0.03, sx = 1 + this.squish * 0.25 + br, sy = 1 - this.squish * 0.25 - br;
         ctx.save(); ctx.translate(this.x, this.y); ctx.scale(sx, sy);
         ctx.beginPath(); ctx.ellipse(0, R * 0.95, R * 0.9, R * 0.25, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fill();
-        const bg = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.15);
-        if (this.hurtFlash > 0) { bg.addColorStop(0, '#ffb3b3'); bg.addColorStop(0.5, '#ff6b6b'); bg.addColorStop(1, '#b03030'); }
+        const bg = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.15); 
+        
+        // Цвета для разных свиней
+        if (this.type === 'boss') { bg.addColorStop(0, '#e0c0ff'); bg.addColorStop(0.5, '#b388ff'); bg.addColorStop(1, '#7c4dff'); }
+        else if (this.hurtFlash > 0) { bg.addColorStop(0, '#ffb3b3'); bg.addColorStop(0.5, '#ff6b6b'); bg.addColorStop(1, '#b03030'); } 
         else { bg.addColorStop(0, '#c5f7ae'); bg.addColorStop(0.5, '#79d65c'); bg.addColorStop(1, '#3f8a2a'); }
+        
         ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill();
         ctx.beginPath(); ctx.ellipse(-R*0.35, -R*0.45, R*0.35, R*0.22, -0.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
         ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(30,70,20,0.8)'; ctx.lineWidth = 2; ctx.stroke();
+        
+        // Уши
         ctx.beginPath(); ctx.ellipse(-R*0.75, -R*0.55, R*0.22, R*0.3, -0.6, 0, Math.PI * 2); ctx.fillStyle = '#5cae42'; ctx.fill(); ctx.strokeStyle = '#3f8a2a'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.beginPath(); ctx.ellipse(R*0.75, -R*0.55, R*0.22, R*0.3, 0.6, 0, Math.PI * 2); ctx.fillStyle = '#5cae42'; ctx.fill(); ctx.stroke();
-        const eyeOpen = this.blink > 0 ? 0.1 : 1;
-        ctx.beginPath(); ctx.ellipse(-R*0.3, -R*0.2, R*0.22, R*0.26 * eyeOpen, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(R*0.3, -R*0.2, R*0.22, R*0.26 * eyeOpen, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
-        if (this.blink <= 0) {
-            ctx.beginPath(); ctx.arc(-R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
+        
+        // Глаза
+        const eo = this.blink > 0 ? 0.1 : 1;
+        ctx.beginPath(); ctx.ellipse(-R*0.3, -R*0.2, R*0.22, R*0.26 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(R*0.3, -R*0.2, R*0.22, R*0.26 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
+        if (this.blink <= 0) { 
+            ctx.beginPath(); ctx.arc(-R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill(); 
             ctx.beginPath(); ctx.arc(R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
-            ctx.beginPath(); ctx.arc(-R*0.31, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
-            ctx.beginPath(); ctx.arc(R*0.25, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-R*0.31, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); 
+            ctx.beginPath(); ctx.arc(R*0.25, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); 
         }
-        ctx.beginPath(); ctx.ellipse(0, R*0.28, R*0.42, R*0.32, 0, 0, Math.PI * 2);
+        // Пятачок
+        ctx.beginPath(); ctx.ellipse(0, R*0.28, R*0.42, R*0.32, 0, 0, Math.PI * 2); 
         const sg = ctx.createRadialGradient(-R*0.1, R*0.2, 2, 0, R*0.28, R*0.5); sg.addColorStop(0, '#b8f0a0'); sg.addColorStop(1, '#5cae42');
         ctx.fillStyle = sg; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(-R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill();
-        ctx.beginPath(); ctx.ellipse(R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill();
-        ctx.restore();
-        if (this.hp < this.maxHp) {
-            const bw = R * 2.2, bh = 6, bx = this.x - bw / 2, by = this.y - R - 18, pct = clamp(this.hp / this.maxHp, 0, 1);
-            ctx.fillStyle = 'rgba(0,0,0,0.55)'; roundRect(bx - 1, by - 1, bw + 2, bh + 2, 4); ctx.fill();
-            ctx.fillStyle = pct > 0.5 ? '#4cd964' : pct > 0.25 ? '#ffcc00' : '#ff3b30';
-            roundRect(bx, by, bw * pct, bh, 3); ctx.fill();
-            ctx.fillStyle = 'rgba(255,255,255,0.3)'; roundRect(bx, by, bw * pct, bh / 2, 3); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(-R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); 
+        ctx.beginPath(); ctx.ellipse(R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); 
+
+        // Отрисовка Каски
+        if (this.type === 'helmet') {
+            ctx.beginPath();
+            ctx.arc(0, -R*0.3, R*0.95, Math.PI, 0);
+            ctx.lineTo(R*1.0, -R*0.3);
+            ctx.lineTo(-R*1.0, -R*0.3);
+            ctx.closePath();
+            const hg = ctx.createLinearGradient(0, -R*1.2, 0, -R*0.3);
+            hg.addColorStop(0, '#a0a0a0'); hg.addColorStop(1, '#505050');
+            ctx.fillStyle = hg;
+            ctx.fill();
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
         }
+
+        // Корона для босса
+        if (this.type === 'boss') {
+            ctx.beginPath();
+            ctx.moveTo(-R*0.6, -R*0.8);
+            ctx.lineTo(-R*0.8, -R*1.3);
+            ctx.lineTo(-R*0.3, -R*1.0);
+            ctx.lineTo(0, -R*1.5);
+            ctx.lineTo(R*0.3, -R*1.0);
+            ctx.lineTo(R*0.8, -R*1.3);
+            ctx.lineTo(R*0.6, -R*0.8);
+            ctx.closePath();
+            ctx.fillStyle = '#ffd700';
+            ctx.fill();
+            ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.stroke();
+            
+            // Полоска здоровья босса
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(-R*1.2, R*1.2, R*2.4, 6);
+            ctx.fillStyle = '#ff3b30';
+            ctx.fillRect(-R*1.2, R*1.2, R*2.4 * (this.hp/3), 6);
+        }
+
+        ctx.restore();
     }
 }
 
 class Block {
-    constructor(x, y, w, h, type = 'wood') {
-        this.x=x; this.y=y; this.w=w; this.h=h; this.type=type; this.vx=0; this.vy=0;
-        this.resting=true; this.hp = type==='stone'?200:100; this.maxHp=this.hp; this.flash=0; this.rot=0; this.rotVel=0; this.texSeed = (x*7+y*13+w*3)%100;
-    }
-    damage(amount) {
-        this.hp -= amount; this.flash = 10;
-        if (this.hp <= 0) {
-            SFX.wood(); spawnBurst(this.x+this.w/2, this.y+this.h/2, this.type==='stone'?'#9aa5b1':'#c8965c', 14);
-            state.score += 20; addScore(20, this.x+this.w/2, this.y+this.h/2);
-            saveData.stats.blocks++; saveGame();
-        }
-    }
-    update() {
-        if (this.flash > 0) this.flash--; if (this.hp <= 0) return;
-        if (!this.resting) {
-            this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy; this.rot += this.rotVel;
-            if (this.y + this.h >= GROUND_Y) {
-                this.y = GROUND_Y - this.h; this.vy *= -0.3; this.vx *= 0.7; this.rotVel *= 0.5;
-                if (Math.abs(this.vy) < 1 && Math.abs(this.vx) < 0.5) { this.vy = 0; this.vx = 0; this.resting = true; this.rotVel = 0; }
-            }
-            if (this.x < 0) { this.x = 0; this.vx *= -0.5; }
-            if (this.x + this.w > W) { this.x = W - this.w; this.vx *= -0.5; }
-        }
-    }
-    draw() {
-        if (this.hp <= 0) return;
-        ctx.save(); ctx.translate(this.x + this.w/2, this.y + this.h/2); ctx.rotate(this.rot);
-        const x = -this.w/2, y = -this.h/2;
-        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
-        let grad;
-        if (this.type === 'stone') {
-            grad = ctx.createLinearGradient(x, y, x+this.w, y+this.h);
-            if (this.flash > 0) { grad.addColorStop(0, '#ffcccc'); grad.addColorStop(1, '#cc8888'); }
-            else { grad.addColorStop(0, '#c5cdd6'); grad.addColorStop(0.5, '#7d8896'); grad.addColorStop(1, '#4d5762'); }
-        } else {
-            grad = ctx.createLinearGradient(x, y, x, y+this.h);
-            if (this.flash > 0) { grad.addColorStop(0, '#ffb3b3'); grad.addColorStop(1, '#cc6666'); }
-            else { grad.addColorStop(0, '#e0b078'); grad.addColorStop(0.4, '#c8965c'); grad.addColorStop(1, '#8a5c2c'); }
-        }
-        ctx.fillStyle = grad; ctx.fillRect(x, y, this.w, this.h);
-        ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-        if (this.type === 'wood') {
-            ctx.strokeStyle = 'rgba(80,40,10,0.35)'; ctx.lineWidth = 1;
-            const isVert = this.h > this.w, count = Math.max(2, Math.floor(isVert ? this.w/8 : this.h/8));
-            for (let i = 1; i < count; i++) {
-                ctx.beginPath();
-                if (isVert) { const px = x + i*(this.w/count); ctx.moveTo(px, y); ctx.lineTo(px, y+this.h); }
-                else { const py = y + i*(this.h/count); ctx.moveTo(x, py); ctx.lineTo(x+this.w, py); }
-                ctx.stroke();
-            }
-        } else {
-            ctx.strokeStyle = 'rgba(40,50,60,0.4)'; ctx.lineWidth = 1;
-            for (let i = 0; i < 3; i++) {
-                const sx = x + ((this.texSeed+i*37)%100)/100*this.w, sy = y + ((this.texSeed+i*53)%100)/100*this.h;
-                ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx+8, sy+10); ctx.lineTo(sx+3, sy+18); ctx.stroke();
-            }
-        }
+    constructor(x, y, w, h, type = 'wood') { this.x=x; this.y=y; this.w=w; this.h=h; this.type=type; this.vx=0; this.vy=0; this.resting=true; this.hp = type==='stone'?200:100; this.maxHp=this.hp; this.flash=0; this.rot=0; this.rotVel=0; this.texSeed = (x*7+y*13+w*3)%100; }
+    damage(amount) { this.hp -= amount; this.flash = 10;
+        if (this.hp <= 0) { SFX.wood(); spawnBurst(this.x+this.w/2, this.y+this.h/2, this.type==='stone'?'#9aa5b1':'#c8965c', 14); state.score += 500; addScore(500, this.x+this.w/2, this.y+this.h/2); saveData.stats.blocks++; saveGame(); } }
+    update() { if (this.flash > 0) this.flash--; if (this.hp <= 0) return;
+        if (!this.resting) { this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy; this.rot += this.rotVel;
+            if (this.y + this.h >= GROUND_Y) { this.y = GROUND_Y - this.h; this.vy *= -0.3; this.vx *= 0.7; this.rotVel *= 0.5;
+                if (Math.abs(this.vy) < 1 && Math.abs(this.vx) < 0.5) { this.vy = 0; this.vx = 0; this.resting = true; this.rotVel = 0; } }
+            if (this.x < 0) { this.x = 0; this.vx *= -0.5; } if (this.x + this.w > W) { this.x = W - this.w; this.vx *= -0.5; } } }
+    draw() { if (this.hp <= 0) return;
+        ctx.save(); ctx.translate(this.x + this.w/2, this.y + this.h/2); ctx.rotate(this.rot); const x = -this.w/2, y = -this.h/2;
+        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4; let grad;
+        if (this.type === 'stone') { grad = ctx.createLinearGradient(x, y, x+this.w, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#ffcccc'); grad.addColorStop(1, '#cc8888'); } else { grad.addColorStop(0, '#c5cdd6'); grad.addColorStop(0.5, '#7d8896'); grad.addColorStop(1, '#4d5762'); } }
+        else { grad = ctx.createLinearGradient(x, y, x, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#ffb3b3'); grad.addColorStop(1, '#cc6666'); } else { grad.addColorStop(0, '#e0b078'); grad.addColorStop(0.4, '#c8965c'); grad.addColorStop(1, '#8a5c2c'); } }
+        ctx.fillStyle = grad; ctx.fillRect(x, y, this.w, this.h); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+        if (this.type === 'wood') { ctx.strokeStyle = 'rgba(80,40,10,0.35)'; ctx.lineWidth = 1; const iV = this.h > this.w, c = Math.max(2, Math.floor(iV ? this.w/8 : this.h/8));
+            for (let i = 1; i < c; i++) { ctx.beginPath(); if (iV) { const px = x + i*(this.w/c); ctx.moveTo(px, y); ctx.lineTo(px, y+this.h); } else { const py = y + i*(this.h/c); ctx.moveTo(x, py); ctx.lineTo(x+this.w, py); } ctx.stroke(); } }
+        else { ctx.strokeStyle = 'rgba(40,50,60,0.4)'; ctx.lineWidth = 1; for (let i = 0; i < 3; i++) { const sx = x + ((this.texSeed+i*37)%100)/100*this.w, sy = y + ((this.texSeed+i*53)%100)/100*this.h; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx+8, sy+10); ctx.lineTo(sx+3, sy+18); ctx.stroke(); } }
         ctx.strokeStyle = this.type==='stone'?'#2d3742':'#5a3a1a'; ctx.lineWidth = 2; ctx.strokeRect(x, y, this.w, this.h);
-        const blik = ctx.createLinearGradient(x, y, x, y+this.h*0.35);
-        blik.addColorStop(0, 'rgba(255,255,255,0.35)'); blik.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = blik; ctx.fillRect(x, y, this.w, this.h*0.35);
-        ctx.restore();
-        if (this.hp < this.maxHp) {
-            const pct = this.hp/this.maxHp;
-            ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(this.x-1, this.y-8, this.w+2, 5);
-            ctx.fillStyle = pct > 0.5 ? '#4cd964' : pct > 0.25 ? '#ffcc00' : '#ff3b30';
-            ctx.fillRect(this.x, this.y-7, this.w*pct, 3);
-        }
+        const blik = ctx.createLinearGradient(x, y, x, y+this.h*0.35); blik.addColorStop(0, 'rgba(255,255,255,0.35)'); blik.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = blik; ctx.fillRect(x, y, this.w, this.h*0.35); ctx.restore();
     }
 }
 
 class Particle {
-    constructor(x, y, color, opts = {}) {
-        this.x = x; this.y = y; this.vx = opts.vx ?? rand(-5, 5); this.vy = opts.vy ?? rand(-8, -1);
-        this.size = opts.size ?? rand(3, 7); this.color = color; this.life = 1;
-        this.decay = opts.decay ?? rand(0.012, 0.025); this.gravity = opts.gravity ?? 0.3;
-        this.shape = opts.shape ?? 'circle'; this.rot = rand(0, Math.PI * 2); this.rotVel = rand(-0.2, 0.2);
-    }
+    constructor(x, y, c, o = {}) { this.x = x; this.y = y; this.vx = o.vx ?? rand(-5, 5); this.vy = o.vy ?? rand(-8, -1); this.size = o.size ?? rand(3, 7); this.color = c; this.life = 1; this.decay = o.decay ?? rand(0.012, 0.025); this.gravity = o.gravity ?? 0.3; this.shape = o.shape ?? 'circle'; this.rot = rand(0, Math.PI * 2); this.rotVel = rand(-0.2, 0.2); }
     update() { this.x += this.vx; this.y += this.vy; this.vy += this.gravity; this.vx *= 0.98; this.life -= this.decay; this.rot += this.rotVel; }
-    draw() {
-        ctx.save(); ctx.globalAlpha = Math.max(0, this.life); ctx.translate(this.x, this.y); ctx.rotate(this.rot); ctx.fillStyle = this.color;
-        if (this.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, this.size, 0, Math.PI * 2); ctx.fill(); }
-        else if (this.shape === 'feather') { ctx.beginPath(); ctx.ellipse(0, 0, this.size * 1.4, this.size * 0.5, 0, 0, Math.PI * 2); ctx.fill(); }
-        ctx.restore();
-    }
+    draw() { ctx.save(); ctx.globalAlpha = Math.max(0, this.life); ctx.translate(this.x, this.y); ctx.rotate(this.rot); ctx.fillStyle = this.color; if (this.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, this.size, 0, Math.PI * 2); ctx.fill(); } else if (this.shape === 'feather') { ctx.beginPath(); ctx.ellipse(0, 0, this.size * 1.4, this.size * 0.5, 0, 0, Math.PI * 2); ctx.fill(); } ctx.restore(); }
 }
-
 class FloatingText {
-    constructor(x, y, text, color = '#fff') { this.x = x; this.y = y; this.text = text; this.color = color; this.life = 1; this.vy = -1.5; }
+    constructor(x, y, t, c) { this.x = x; this.y = y; this.text = t; this.color = c; this.life = 1; this.vy = -1.5; }
     update() { this.y += this.vy; this.vy *= 0.96; this.life -= 0.02; }
-    draw() {
-        ctx.save(); ctx.globalAlpha = Math.max(0, this.life); ctx.font = 'bold 22px "Segoe UI", sans-serif'; ctx.textAlign = 'center';
-        ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.strokeText(this.text, this.x, this.y);
-        ctx.fillStyle = this.color; ctx.fillText(this.text, this.x, this.y); ctx.restore();
-    }
+    draw() { ctx.save(); ctx.globalAlpha = Math.max(0, this.life); ctx.font = 'bold 22px "Segoe UI", sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.strokeText(this.text, this.x, this.y); ctx.fillStyle = this.color; ctx.fillText(this.text, this.x, this.y); ctx.restore(); }
 }
 
-function spawnBurst(x, y, color, count = 12) {
-    for (let i = 0; i < count; i++) particles.push(new Particle(x, y, color, {vx:rand(-7,7),vy:rand(-9,0),size:rand(3,8),gravity:0.35}));
-}
-function spawnDust(x, y, count = 8) {
-    for (let i = 0; i < count; i++) particles.push(new Particle(x+rand(-15,15), y, 'rgba(200,180,150,0.8)', {vx:rand(-3,3),vy:rand(-4,-0.5),size:rand(4,10),gravity:0.1,decay:rand(0.02,0.04)}));
-}
-function spawnFeathers(x, y, count = 5, color = null) {
-    for (let i = 0; i < count; i++) feathers.push(new Particle(x, y, color||['#ff6b6b','#ffd93d','#ffffff'][randInt(0,2)], {vx:rand(-4,4),vy:rand(-6,-1),size:rand(4,8),gravity:0.06,decay:rand(0.008,0.018),shape:'feather'}));
-}
-function addScore(amount, x, y) { floatingTexts.push(new FloatingText(x, y, '+' + amount, '#ffe066')); updateHUD(); }
+function spawnBurst(x, y, c, n = 12) { for (let i = 0; i < n; i++) particles.push(new Particle(x, y, c, {vx:rand(-7,7),vy:rand(-9,0),size:rand(3,8),gravity:0.35})); }
+function spawnDust(x, y, n = 8) { for (let i = 0; i < n; i++) particles.push(new Particle(x+rand(-15,15), y, 'rgba(200,180,150,0.8)', {vx:rand(-3,3),vy:rand(-4,-0.5),size:rand(4,10),gravity:0.1,decay:rand(0.02,0.04)})); }
+function spawnFeathers(x, y, n = 5, c = null) { for (let i = 0; i < n; i++) feathers.push(new Particle(x, y, c||['#ff6b6b','#ffd93d','#ffffff'][randInt(0,2)], {vx:rand(-4,4),vy:rand(-6,-1),size:rand(4,8),gravity:0.06,decay:rand(0.008,0.018),shape:'feather'})); }
+function addScore(a, x, y) { floatingTexts.push(new FloatingText(x, y, '+' + a, '#ffe066')); updateHUD(); }
 
 function initBackground() {
     clouds = []; for(let i=0; i<8; i++) clouds.push({x:rand(0,W),y:rand(40,220),scale:rand(0.5,1.4),speed:rand(0.05,0.18),alpha:rand(0.35,0.85)});
@@ -763,51 +513,20 @@ function initBackground() {
 }
 
 function drawSky() {
-    const currentBiome = LEVELS[state.currentLevel] ? LEVELS[state.currentLevel].biome : 'sunset';
-    const b = BIOMES[currentBiome];
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y + 50);
-    skyGrad.addColorStop(0, b.skyTop); skyGrad.addColorStop(0.5, b.skyMid); skyGrad.addColorStop(1, b.skyBot);
-    ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, W, GROUND_Y + 50);
-
-    stars.forEach(s => {
-        s.twinkle += s.speed; const a = 0.4 + Math.sin(s.twinkle) * 0.4;
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.fill();
-    });
-
-    if (currentBiome === 'night' || currentBiome === 'sunset') {
-        ctx.save(); ctx.shadowColor = 'rgba(255,240,200,0.9)'; ctx.shadowBlur = 40;
-        ctx.beginPath(); ctx.arc(830, 100, 42, 0, Math.PI * 2);
-        const mg = ctx.createRadialGradient(820, 90, 5, 830, 100, 45); mg.addColorStop(0, '#fffbe8'); mg.addColorStop(0.7, '#ffeeb5'); mg.addColorStop(1, '#f5d98a');
-        ctx.fillStyle = mg; ctx.fill(); ctx.restore();
-    }
-
-    ctx.fillStyle = b.mountain;
-    ctx.beginPath(); ctx.moveTo(0, GROUND_Y - 20);
-    for (let x = 0; x <= W; x += 50) { const h = 60 + Math.sin(x * 0.008) * 30 + Math.sin(x * 0.021) * 20; ctx.lineTo(x, GROUND_Y - 30 - h); }
-    ctx.lineTo(W, GROUND_Y); ctx.lineTo(0, GROUND_Y); ctx.closePath(); ctx.fill();
-
-    ctx.fillStyle = 'rgba(40,30,80,0.75)';
-    ctx.beginPath(); ctx.moveTo(0, GROUND_Y);
-    for (let x = 0; x <= W; x += 40) { const h = 30 + Math.sin(x * 0.012 + 1) * 20 + Math.cos(x * 0.03) * 15; ctx.lineTo(x, GROUND_Y - h); }
-    ctx.lineTo(W, GROUND_Y); ctx.closePath(); ctx.fill();
-
-    clouds.forEach(c => {
-        c.x += c.speed; if (c.x > W + 120 * c.scale) c.x = -120 * c.scale;
-        ctx.save(); ctx.globalAlpha = c.alpha; ctx.fillStyle = 'rgba(255, 245, 235, 0.85)';
-        ctx.beginPath(); ctx.arc(c.x, c.y, 28*c.scale, 0, Math.PI*2); ctx.arc(c.x+30*c.scale, c.y-8*c.scale, 34*c.scale, 0, Math.PI*2);
-        ctx.arc(c.x+65*c.scale, c.y, 26*c.scale, 0, Math.PI*2); ctx.arc(c.x+35*c.scale, c.y+12*c.scale, 30*c.scale, 0, Math.PI*2);
-        ctx.arc(c.x+5*c.scale, c.y+10*c.scale, 22*c.scale, 0, Math.PI*2); ctx.fill(); ctx.restore();
-    });
+    const curB = LEVELS[state.currentLevel] ? LEVELS[state.currentLevel].biome : 'sunset', b = BIOMES[curB];
+    const sg = ctx.createLinearGradient(0, 0, 0, GROUND_Y + 50); sg.addColorStop(0, b.skyTop); sg.addColorStop(0.5, b.skyMid); sg.addColorStop(1, b.skyBot);
+    ctx.fillStyle = sg; ctx.fillRect(0, 0, W, GROUND_Y + 50);
+    stars.forEach(s => { s.twinkle += s.speed; const a = 0.4 + Math.sin(s.twinkle) * 0.4; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.fill(); });
+    if (curB === 'night' || curB === 'sunset') { ctx.save(); ctx.shadowColor = 'rgba(255,240,200,0.9)'; ctx.shadowBlur = 40; ctx.beginPath(); ctx.arc(830, 100, 42, 0, Math.PI * 2); const mg = ctx.createRadialGradient(820, 90, 5, 830, 100, 45); mg.addColorStop(0, '#fffbe8'); mg.addColorStop(0.7, '#ffeeb5'); mg.addColorStop(1, '#f5d98a'); ctx.fillStyle = mg; ctx.fill(); ctx.restore(); }
+    ctx.fillStyle = b.mountain; ctx.beginPath(); ctx.moveTo(0, GROUND_Y - 20); for (let x = 0; x <= W; x += 50) { const h = 60 + Math.sin(x * 0.008) * 30 + Math.sin(x * 0.021) * 20; ctx.lineTo(x, GROUND_Y - 30 - h); } ctx.lineTo(W, GROUND_Y); ctx.lineTo(0, GROUND_Y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(40,30,80,0.75)'; ctx.beginPath(); ctx.moveTo(0, GROUND_Y); for (let x = 0; x <= W; x += 40) { const h = 30 + Math.sin(x * 0.012 + 1) * 20 + Math.cos(x * 0.03) * 15; ctx.lineTo(x, GROUND_Y - h); } ctx.lineTo(W, GROUND_Y); ctx.closePath(); ctx.fill();
+    clouds.forEach(c => { c.x += c.speed; if (c.x > W + 120 * c.scale) c.x = -120 * c.scale; ctx.save(); ctx.globalAlpha = c.alpha; ctx.fillStyle = 'rgba(255, 245, 235, 0.85)'; ctx.beginPath(); ctx.arc(c.x, c.y, 28*c.scale, 0, Math.PI*2); ctx.arc(c.x+30*c.scale, c.y-8*c.scale, 34*c.scale, 0, Math.PI*2); ctx.arc(c.x+65*c.scale, c.y, 26*c.scale, 0, Math.PI*2); ctx.arc(c.x+35*c.scale, c.y+12*c.scale, 30*c.scale, 0, Math.PI*2); ctx.arc(c.x+5*c.scale, c.y+10*c.scale, 22*c.scale, 0, Math.PI*2); ctx.fill(); ctx.restore(); });
 }
 
 function drawGround() {
-    const currentBiome = LEVELS[state.currentLevel] ? LEVELS[state.currentLevel].biome : 'sunset';
-    const b = BIOMES[currentBiome];
-    const grad = ctx.createLinearGradient(0, GROUND_Y, 0, H);
-    grad.addColorStop(0, b.ground1); grad.addColorStop(1, b.ground2);
-    ctx.fillStyle = grad; ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.fillRect(0, GROUND_Y, W, 4);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 2;
+    const curB = LEVELS[state.currentLevel] ? LEVELS[state.currentLevel].biome : 'sunset', b = BIOMES[curB];
+    const grad = ctx.createLinearGradient(0, GROUND_Y, 0, H); grad.addColorStop(0, b.ground1); grad.addColorStop(1, b.ground2); ctx.fillStyle = grad; ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.fillRect(0, GROUND_Y, W, 4); ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 2;
     for (let i = 0; i < W; i += 12) { const h = 6 + Math.sin(i * 0.3 + state.time * 0.02) * 3; ctx.beginPath(); ctx.moveTo(i, GROUND_Y + 2); ctx.quadraticCurveTo(i + 3, GROUND_Y - h, i + 7, GROUND_Y + 2); ctx.stroke(); }
 }
 
@@ -833,16 +552,13 @@ function drawSlingshotFront() {
     const anchorL = slingshot.forkLeft, anchorR = slingshot.forkRight;
     let birdX = bird ? bird.x : slingshot.x, birdY = bird ? bird.y : slingshot.y;
 
-    // РЕЗИНКИ РВУТСЯ ПОСЛЕ ВЫСТРЕЛА
     if (bird && !bird.launched) {
         ctx.strokeStyle = '#3a2410'; ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(anchorR.x, anchorR.y); ctx.lineTo(birdX + 3, birdY + 3); ctx.stroke();
         ctx.strokeStyle = '#5a3818'; ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(anchorL.x, anchorL.y); ctx.lineTo(birdX - 3, birdY - 3); ctx.stroke();
-        // Кожаная накладка
         ctx.beginPath(); ctx.ellipse(birdX, birdY + 8, 12, 8, 0, 0, Math.PI * 2); ctx.fillStyle = '#3a2410'; ctx.fill();
     } else {
-        // Свободно висят
         ctx.strokeStyle = '#3a2410'; ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(anchorR.x, anchorR.y); ctx.quadraticCurveTo(anchorR.x - 10, anchorR.y + 30, anchorR.x - 5, anchorR.y + 50); ctx.stroke();
         ctx.strokeStyle = '#5a3818';
@@ -856,21 +572,21 @@ function drawTrajectory() {
     const dx = slingshot.x - bird.x, dy = slingshot.y - bird.y;
     const power = Math.min(Math.hypot(dx, dy), MAX_PULL);
     const angle = Math.atan2(dy, dx);
-    const vx = Math.cos(angle) * power * LAUNCH_MULT, vy = Math.sin(angle) * power * LAUNCH_MULT;
+    let vx = Math.cos(angle) * power * LAUNCH_MULT, vy = Math.sin(angle) * power * LAUNCH_MULT;
 
-    let sx = slingshot.x, sy = slingshot.y, svx = vx, svy = vy;
+    let sx = slingshot.x, sy = slingshot.y;
     ctx.save(); ctx.setLineDash([6, 12]); ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(sx, sy);
     for (let i = 0; i < 80; i++) {
-        svy += GRAVITY; sx += svx; sy += svy;
+        vy += GRAVITY; vx *= AIR; vy *= AIR; sx += vx; sy += vy;
         if (sy > GROUND_Y || sx > W || sx < 0) break;
         ctx.lineTo(sx, sy);
     }
     ctx.stroke(); ctx.restore();
 
-    sx = slingshot.x; sy = slingshot.y; svx = vx; svy = vy;
+    sx = slingshot.x; sy = slingshot.y; vx = Math.cos(angle) * power * LAUNCH_MULT; vy = Math.sin(angle) * power * LAUNCH_MULT;
     for (let i = 0; i < 80; i++) {
-        svy += GRAVITY; sx += svx; sy += svy;
+        vy += GRAVITY; vx *= AIR; vy *= AIR; sx += vx; sy += vy;
         if (sy > GROUND_Y || sx > W || sx < 0) break;
         if (i % 5 === 0) {
             const t = i / 80, alpha = 0.9 * (1 - t * 0.7), r = 3.5 * (1 - t * 0.4);
@@ -918,7 +634,8 @@ function updatePhysics() {
         pigs.forEach(pig => {
             if (pig.dead || b.hitCooldown > 0) return;
             if (circleCircle(b, pig)) {
-                pig.damage(clamp(speed * 14, 20, 160)); pig.vx = b.vx * 0.6; pig.vy = b.vy * 0.5 - 2; pig.resting = false;
+                pig.damage(999, Math.atan2(b.y-pig.y, b.x-pig.x)); 
+                pig.vx = b.vx * 0.6; pig.vy = b.vy * 0.5 - 2; pig.resting = false;
                 const dx = b.x - pig.x, dy = b.y - pig.y, d = Math.hypot(dx, dy) || 1;
                 b.vx = (dx / d) * speed * 0.55; b.vy = (dy / d) * speed * 0.55 - 1; b.hitCooldown = 6;
                 SFX.hit(); state.shake = 9; spawnBurst(pig.x, pig.y, '#ffd93d', 8);
@@ -939,7 +656,7 @@ function updatePhysics() {
         if (pig.dead) return;
         blocks.forEach(block => {
             if (block.hp <= 0) return;
-            if (circleRect(pig, block)) { resolveCircleRect(pig, block); if (Math.hypot(pig.vx, pig.vy) > 4) pig.damage(Math.hypot(pig.vx, pig.vy) * 4); pig.resting = false; }
+            if (circleRect(pig, block)) { resolveCircleRect(pig, block); if (Math.hypot(pig.vx, pig.vy) > 4) pig.damage(999, Math.PI/2); pig.resting = false; }
         });
     });
 
@@ -973,7 +690,7 @@ function loadLevel(idx) {
     lastAbilityTime = 0;
 
     currentBirdQueue = [...level.birds]; spawnNextBird();
-    level.pigs.forEach(p => pigs.push(new Pig(p.x, p.y, p.r)));
+    level.pigs.forEach(p => pigs.push(new Pig(p.x, p.y, p.r, p.type || 'normal')));
     level.blocks.forEach(b => blocks.push(new Block(b.x, b.y, b.w, b.h, b.type)));
 
     updateHUD(); hideOverlay();
@@ -1002,14 +719,32 @@ function endShot() {
 
     const alivePigs = pigs.filter(p => !p.dead).length;
     if (alivePigs === 0) { setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showVictory(); } }, 600); return; }
-    if (currentBirdQueue.length === 0) { setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showDefeat(); } }, 600); return; }
+    
+    if (currentBirdQueue.length === 0) { 
+        setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showDefeat(); } }, 600); 
+        return; 
+    }
 
     setTimeout(() => { if (state.phase === 'settling') { birds = birds.filter(b => b.launched && !b.resting); bird = null; spawnNextBird(); } }, 700);
 }
 
 function showVictory() {
-    const level = LEVELS[currentLevelIdx]; let stars = 1;
-    if (state.score >= level.stars[2]) stars = 3; else if (state.score >= level.stars[1]) stars = 2;
+    const unusedBirds = currentBirdQueue.length;
+    if (unusedBirds > 0) {
+        const bonus = unusedBirds * 10000;
+        state.score += bonus;
+        addScore(bonus, slingshot.x + 50, slingshot.y - 50);
+        SFX.star(); updateHUD();
+    }
+
+    const level = LEVELS[currentLevelIdx]; 
+    
+    // Подсчет идеального максимума для уровня (все свиньи + все блоки + бонус за 1 оставшуюся птицу)
+    const maxPossible = (level.pigs.length * 5000) + (level.blocks.length * 500) + 10000;
+    let stars = 1;
+    if (state.score >= maxPossible * 0.85) stars = 3; 
+    else if (state.score >= maxPossible * 0.60) stars = 2;
+    
     if (!saveData.levels[currentLevelIdx] || state.score > saveData.levels[currentLevelIdx].score) saveData.levels[currentLevelIdx] = { score: state.score, stars };
     saveGame(); checkAchievements();
 
